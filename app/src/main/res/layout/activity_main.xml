@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<fragment
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,21 +7,9 @@
     android:layout_height="match_parent"
     android:columnCount="1"
     android:orientation="vertical"
+    android:name="com.example.dan.baking_app.MasterListFragment"
     tools:context="com.example.dan.baking_app.MainActivity">
 
-    <android.support.v7.widget.CardView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/textview_recipe_name"/>
 
-    </android.support.v7.widget.CardView>
-
-</LinearLayout>
+</fragment>
