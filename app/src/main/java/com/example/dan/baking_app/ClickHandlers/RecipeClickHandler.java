@@ -1,10 +1,8 @@
 package com.example.dan.baking_app.ClickHandlers;
 
-/**
- * Created by dcalabrese on 5/15/2017.
- */
+import com.example.dan.baking_app.objects.Recipe;
 
 public interface RecipeClickHandler {
 
-    void onRecipeClick();
+    void onRecipeClick(Recipe recipe);
 }

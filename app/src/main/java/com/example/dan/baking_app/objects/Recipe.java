@@ -1,10 +1,10 @@
 package com.example.dan.baking_app.objects;
 
-import java.util.ArrayList;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-/**
- * Created by dcalabrese on 5/15/2017.
- */
+import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Recipe {
 

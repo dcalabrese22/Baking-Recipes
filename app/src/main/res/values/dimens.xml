@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="cardview_width_port">350dp</dimen>
+    <dimen name="cardview_width_land">175dp</dimen>
+    <dimen name="cardview_height_port">200dp</dimen>
+    <dimen name="cardview_height_land">75dp</dimen>
+</resources>

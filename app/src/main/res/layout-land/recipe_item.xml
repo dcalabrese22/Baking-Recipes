@@ -8,8 +8,8 @@
     android:id="@+id/cardview_recipe_item">
     
     <android.support.v7.widget.CardView
-        android:layout_width="@dimen/cardview_width_port"
-        android:layout_height="@dimen/cardview_height_port"
+        android:layout_width="@dimen/cardview_width_land"
+        android:layout_height="@dimen/cardview_height_land"
         android:layout_margin="15dp"
         android:layout_gravity="center" >
 

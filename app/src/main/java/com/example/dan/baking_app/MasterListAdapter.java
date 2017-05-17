@@ -16,17 +16,12 @@ import java.util.ArrayList;
 public class MasterListAdapter extends
         RecyclerView.Adapter<MasterListAdapter.RecipeViewHolder> {
 
-    private static final int RECIPE_VIEW_TYPE = 1;
-    private static final int INGREDIENT_VIEW_TYPE = 2;
-    private static final int STEP_VIEW_TYPE = 3;
-
     private RecipeClickHandler mRecipeClickHandler;
 
     private ArrayList<Recipe> mRecipes;
-    private Context mContext;
 
-    public MasterListAdapter(Context context) {
-        mContext = context;
+    public MasterListAdapter(RecipeClickHandler clickHandler) {
+        mRecipeClickHandler = clickHandler;
     }
 
     public void setRecipeData(ArrayList<Recipe> recipes) {
@@ -44,8 +39,8 @@ public class MasterListAdapter extends
     }
 
     @Override
-    public void onBindViewHolder(RecipeViewHolder holder, int position) {
-        TextView target = ((RecipeViewHolder) holder).recipeName;
+    public void onBindViewHolder(RecipeViewHolder holder, final int position) {
+        TextView target = holder.recipeName;
         Recipe recipe = mRecipes.get(position);
         String recipeName = recipe.getName();
         target.setText(recipeName);
@@ -61,26 +56,24 @@ public class MasterListAdapter extends
         return new RecipeViewHolder(view);
     }
 
-    public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+
+    public class RecipeViewHolder extends RecyclerView.ViewHolder {
 
         TextView recipeName;
 
         public RecipeViewHolder(View view) {
             super(view);
             recipeName = (TextView) view.findViewById(R.id.textview_recipe_name);
-            view.setOnClickListener(this);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Recipe recipe = mRecipes.get(getAdapterPosition());
+                    mRecipeClickHandler.onRecipeClick(recipe);
+                }
+            });
         }
 
-        @Override
-        public void onClick(View v) {
-            int adapterPosition = getAdapterPosition();
-            Recipe recipe = mRecipes.get(adapterPosition);
-            mRecipeClickHandler.onRecipeClick();
-        }
     }
 
-//    public class IngredientViewHolder extends RecyclerView.ViewHolder {
-//
-//
-//    }
 }
