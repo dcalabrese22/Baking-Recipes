@@ -26,25 +26,22 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int VIEWTYPE_INGREDIENT = 1;
     private static final int VIEWTYPE_STEP = 2;
 
-    public RecipeAdapter(ArrayList<Ingredient> ingredients, ArrayList<Step> steps) {
-        mIngredients = ingredients;
-        mSteps = steps;
-        mIngredientsAndSteps.addAll(mIngredients);
-        mIngredientsAndSteps.addAll(mSteps);
+    public RecipeAdapter() {
+    }
+
+    public void setData(ArrayList<Ingredient> ingredients, ArrayList<Step> steps) {
+        mIngredientsAndSteps.addAll(ingredients);
+        mIngredientsAndSteps.addAll(steps);
         notifyDataSetChanged();
     }
 
 
     @Override
     public int getItemCount() {
-        if (mIngredients == null && mSteps == null) {
+        if (mIngredientsAndSteps == null) {
             return 0;
-        } else if (mIngredients != null && mSteps == null) {
-            return mIngredients.size();
-        } else if (mSteps != null && mIngredients == null) {
-            return mSteps.size();
         } else {
-            return mIngredients.size() + mSteps.size();
+            return mIngredientsAndSteps.size();
         }
     }
 

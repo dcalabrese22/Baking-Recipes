@@ -1,5 +1,6 @@
 package com.example.dan.baking_app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.GradientDrawable;
@@ -30,14 +31,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MasterListFragment extends Fragment implements RecipeClickHandler {
+public class MasterListFragment extends Fragment {
 
     private MasterListAdapter mAdapter;
 
     public static final String INGREDIENT_EXTRA = "ingredient_extra";
     public static final String STEP_EXTRA = "step_extra";
 
-    private RecipeClickHandler mRecipeClickHandler;
     public MasterListFragment() {}
 
     @Nullable
@@ -56,8 +56,7 @@ public class MasterListFragment extends Fragment implements RecipeClickHandler {
 
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        mRecipeClickHandler = this;
-        mAdapter = new MasterListAdapter(mRecipeClickHandler);
+        mAdapter = new MasterListAdapter((RecipeClickHandler) getActivity());
         recyclerView.setAdapter(mAdapter);
 
         getOnlineRecipes();
@@ -86,16 +85,5 @@ public class MasterListFragment extends Fragment implements RecipeClickHandler {
             }
         });
         MyRequestQueue.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
-    }
-
-    @Override
-    public void onRecipeClick(Recipe recipe) {
-        ArrayList<Ingredient> ingredients = recipe.getIngredients();
-        ArrayList<Step> steps = recipe.getSteps();
-
-        Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
-        intent.putParcelableArrayListExtra(INGREDIENT_EXTRA, ingredients);
-        intent.putParcelableArrayListExtra(STEP_EXTRA, steps);
-        startActivity(intent);
     }
 }

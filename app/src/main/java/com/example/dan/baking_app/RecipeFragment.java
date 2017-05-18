@@ -30,21 +30,24 @@ public class RecipeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootview = inflater.inflate(R.layout.fragment_recipe, container, false);
+        View rootview = inflater.inflate(R.layout.activity_recipe_detail, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) rootview.findViewById(R.id.recyclerview_single_recipe);
+        //RecyclerView recyclerView = (RecyclerView) rootview.findViewById(R.id.recyclerview_single_recipe);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        //LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
-        recyclerView.setLayoutManager(linearLayoutManager);
+        //recyclerView.setLayoutManager(linearLayoutManager);
 
-        mIngredients = getArguments().getParcelableArrayList(MasterListFragment.INGREDIENT_EXTRA);
-        mSteps = getArguments().getParcelableArrayList(MasterListFragment.STEP_EXTRA);
+        //mIngredients = getArguments().getParcelableArrayList(MasterListFragment.INGREDIENT_EXTRA);
+        //mSteps = getArguments().getParcelableArrayList(MasterListFragment.STEP_EXTRA);
 
-        RecipeAdapter adapter = new RecipeAdapter(mIngredients, mSteps);
-        recyclerView.setAdapter(adapter);
+        //RecipeAdapter adapter = new RecipeAdapter();
+
+        //adapter.setData(mIngredients, mSteps);
+        //recyclerView.setAdapter(adapter);
 
         return rootview;
     }
+
 
 }

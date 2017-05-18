@@ -20,13 +20,17 @@ public class MasterListAdapter extends
 
     private ArrayList<Recipe> mRecipes;
 
-    public MasterListAdapter(RecipeClickHandler clickHandler) {
-        mRecipeClickHandler = clickHandler;
+    public MasterListAdapter(RecipeClickHandler recipeClickHandler) {
+        mRecipeClickHandler = recipeClickHandler;
     }
 
     public void setRecipeData(ArrayList<Recipe> recipes) {
         mRecipes = recipes;
         notifyDataSetChanged();
+    }
+
+    public ArrayList<Recipe> getData() {
+        return mRecipes;
     }
 
     @Override
@@ -62,7 +66,7 @@ public class MasterListAdapter extends
 
         TextView recipeName;
 
-        public RecipeViewHolder(View view) {
+        public RecipeViewHolder(final View view) {
             super(view);
             recipeName = (TextView) view.findViewById(R.id.textview_recipe_name);
             view.setOnClickListener(new View.OnClickListener() {
