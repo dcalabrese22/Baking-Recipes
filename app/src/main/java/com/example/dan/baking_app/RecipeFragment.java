@@ -1,5 +1,6 @@
 package com.example.dan.baking_app;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
+import com.example.dan.baking_app.Interfaces.StepClickHandler;
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Step;
 
@@ -18,6 +21,12 @@ public class RecipeFragment extends Fragment {
 
     ArrayList<Ingredient> mIngredients;
     ArrayList<Step> mSteps;
+
+    RecyclerView mRecyclerview;
+    PassRecipeDataHandler mHandler;
+
+    StepClickHandler mStepClickHandler;
+
 
     public RecipeFragment() {}
 
@@ -30,24 +39,28 @@ public class RecipeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootview = inflater.inflate(R.layout.activity_recipe_detail, container, false);
+        View rootview = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
 
-        //RecyclerView recyclerView = (RecyclerView) rootview.findViewById(R.id.recyclerview_single_recipe);
+        Bundle b = new Bundle();
 
-        //LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerview = (RecyclerView) rootview.findViewById(R.id.recyclerview_single_recipe);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerview.setLayoutManager(linearLayoutManager);
 
-        //recyclerView.setLayoutManager(linearLayoutManager);
+        RecipeAdapter adapter = new RecipeAdapter(mStepClickHandler);
+        adapter.setData(mIngredients, mSteps);
 
-        //mIngredients = getArguments().getParcelableArrayList(MasterListFragment.INGREDIENT_EXTRA);
-        //mSteps = getArguments().getParcelableArrayList(MasterListFragment.STEP_EXTRA);
-
-        //RecipeAdapter adapter = new RecipeAdapter();
-
-        //adapter.setData(mIngredients, mSteps);
-        //recyclerView.setAdapter(adapter);
+        mRecyclerview.setAdapter(adapter);
 
         return rootview;
     }
 
-
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mStepClickHandler = (StepClickHandler) getActivity();
+        mHandler = (PassRecipeDataHandler) context;
+        mIngredients = mHandler.passIngredients();
+        mSteps = mHandler.passSteps();
+    }
 }

@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:columnCount="1"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:name="com.example.dan.baking_app.MasterListFragment"
-    tools:context="com.example.dan.baking_app.MainActivity">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recyclerview_recipe_list"/>
 
-
-</fragment>
+</LinearLayout>

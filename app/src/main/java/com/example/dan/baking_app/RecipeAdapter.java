@@ -2,17 +2,16 @@ package com.example.dan.baking_app;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.dan.baking_app.ClickHandlers.StepClickHandler;
+import com.example.dan.baking_app.Interfaces.StepClickHandler;
 import com.example.dan.baking_app.objects.Ingredient;
-import com.example.dan.baking_app.objects.Recipe;
 import com.example.dan.baking_app.objects.Step;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -26,7 +25,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int VIEWTYPE_INGREDIENT = 1;
     private static final int VIEWTYPE_STEP = 2;
 
-    public RecipeAdapter() {
+    public RecipeAdapter(StepClickHandler clickHandler) {
+        mStepClickHandler = clickHandler;
     }
 
     public void setData(ArrayList<Ingredient> ingredients, ArrayList<Step> steps) {
@@ -62,7 +62,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             TextView quantity = ((RecipeIngredientViewHolder) holder).ingredientQuantity;
             TextView name = ((RecipeIngredientViewHolder) holder).ingredientName;
             Ingredient ingredient = (Ingredient) mIngredientsAndSteps.get(position);
-            String qAndMeasure = Integer.toString(ingredient.getQuantity()) + ingredient.getMeasure();
+            String qAndMeasure = Double.toString(ingredient.getQuantity()) + " " + ingredient.getMeasure();
             quantity.setText(qAndMeasure);
             name.setText(ingredient.getName());
         } else if (viewType == VIEWTYPE_STEP) {
