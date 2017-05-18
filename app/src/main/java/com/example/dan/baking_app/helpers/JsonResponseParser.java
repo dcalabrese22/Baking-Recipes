@@ -59,13 +59,13 @@ public class JsonResponseParser {
         try {
             JSONArray ingredientsJsonArray = response.getJSONArray(INGREDIENTS);
 
-            int quantity;
+            double quantity;
             String measure;
             String name;
 
             for (int i = 0; i < ingredientsJsonArray.length(); i++) {
                 JSONObject ingredientData = ingredientsJsonArray.getJSONObject(i);
-                quantity = ingredientData.getInt(QUANTITY);
+                quantity = ingredientData.getDouble(QUANTITY);
                 measure = ingredientData.getString(MEASURE);
                 name = ingredientData.getString(INGREDIENT);
 

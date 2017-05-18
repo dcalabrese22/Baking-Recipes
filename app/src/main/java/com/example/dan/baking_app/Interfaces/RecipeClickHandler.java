@@ -1,6 +1,4 @@
-package com.example.dan.baking_app.ClickHandlers;
-
-import android.view.View;
+package com.example.dan.baking_app.Interfaces;
 
 import com.example.dan.baking_app.objects.Recipe;
 

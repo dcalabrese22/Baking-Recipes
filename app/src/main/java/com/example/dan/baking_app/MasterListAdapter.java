@@ -7,8 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.dan.baking_app.ClickHandlers.RecipeClickHandler;
-import com.example.dan.baking_app.objects.Ingredient;
+import com.example.dan.baking_app.Interfaces.RecipeClickHandler;
 import com.example.dan.baking_app.objects.Recipe;
 
 import java.util.ArrayList;
