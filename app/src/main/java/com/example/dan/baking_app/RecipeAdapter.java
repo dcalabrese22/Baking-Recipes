@@ -25,6 +25,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int VIEWTYPE_INGREDIENT = 1;
     private static final int VIEWTYPE_STEP = 2;
 
+    private int mIngredientsCount = 0;
+
     public RecipeAdapter(StepClickHandler clickHandler) {
         mStepClickHandler = clickHandler;
     }
@@ -65,6 +67,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             String qAndMeasure = Double.toString(ingredient.getQuantity()) + " " + ingredient.getMeasure();
             quantity.setText(qAndMeasure);
             name.setText(ingredient.getName());
+            mIngredientsCount++;
         } else if (viewType == VIEWTYPE_STEP) {
             TextView shortDesc = ((RecipeStepViewHolder) holder).stepShortDesc;
             Step step = (Step) mIngredientsAndSteps.get(position);

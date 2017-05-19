@@ -16,6 +16,10 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     public static final String DESC_STEP_EXTRA = "desc_extra";
     public static final String URL_STEP_EXTRA = "url_extra";
+    public static final String ID_STEP_EXTRA = "id_extra";
+
+    ArrayList<Ingredient> mIngredients;
+    ArrayList<Step> mSteps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,21 +38,30 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public ArrayList<Ingredient> passIngredients() {
-        return getIntent().getExtras().getParcelableArrayList(MainActivity.INGREDIENT_EXTRA);
+        mIngredients = getIntent().getExtras().getParcelableArrayList(MainActivity.INGREDIENT_EXTRA);
+        return mIngredients;
     }
 
     @Override
     public ArrayList<Step> passSteps() {
-        return getIntent().getExtras().getParcelableArrayList(MainActivity.STEP_EXTRA);
+        mSteps = getIntent().getExtras().getParcelableArrayList(MainActivity.STEP_EXTRA);
+        return mSteps;
+    }
+
+    @Override
+    public Step passSingleStep() {
+        return null;
     }
 
     @Override
     public void onStepClick(Step step) {
         String desc = step.getDescription();
         String url = step.getVideoUrl();
+        int id = step.getId();
         Bundle bundle = new Bundle();
         bundle.putString(DESC_STEP_EXTRA, desc);
         bundle.putString(URL_STEP_EXTRA, url);
+        bundle.putInt(ID_STEP_EXTRA, id);
         FragmentManager fragmentManager = getSupportFragmentManager();
         StepFragment stepFragment = new StepFragment();
         stepFragment.setArguments(bundle);

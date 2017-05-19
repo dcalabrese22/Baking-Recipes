@@ -22,6 +22,7 @@ public class JsonResponseParser {
     private static final String INGREDIENT = "ingredient";
 
     private static final String STEPS = "steps";
+    private static final String ID = "id";
     private static final String SHORT_DESCRIPTION = "shortDescription";
     private static final String DESCRIPTION = "description";
     private static final String VIDEO_URL = "videoURL";
@@ -84,16 +85,18 @@ public class JsonResponseParser {
         try {
             JSONArray ingredientsJsonArray = response.getJSONArray(STEPS);
 
+            int id;
             String shortDesc;
             String desc;
             String vidUrl;
 
             for (int i = 0; i < ingredientsJsonArray.length(); i++) {
                 JSONObject ingredientData = ingredientsJsonArray.getJSONObject(i);
+                id = ingredientData.getInt(ID);
                 shortDesc = ingredientData.getString(SHORT_DESCRIPTION);
                 desc = ingredientData.getString(DESCRIPTION);
                 vidUrl = ingredientData.getString(VIDEO_URL);
-                Step stepObject = new Step(shortDesc, desc, vidUrl);
+                Step stepObject = new Step(id, shortDesc, desc, vidUrl);
                 stepsList.add(stepObject);
             }
         } catch (JSONException e) {

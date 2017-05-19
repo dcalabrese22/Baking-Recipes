@@ -14,7 +14,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:background="@null"
-        android:src="@drawable/ic_arrow_back_black_48dp"/>
+        android:src="@drawable/ic_arrow_back_black_48dp"
+        android:id="@+id/imagebutton_prev_step"/>
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -22,6 +23,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:background="@null"
-        android:src="@drawable/ic_arrow_forward_black_48dp"/>
+        android:src="@drawable/ic_arrow_forward_black_48dp"
+        android:id="@+id/imagebutton_next_step"/>
 
 </RelativeLayout>
