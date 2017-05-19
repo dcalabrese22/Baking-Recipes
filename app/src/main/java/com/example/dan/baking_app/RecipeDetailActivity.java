@@ -49,11 +49,6 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     @Override
-    public Step passSingleStep() {
-        return null;
-    }
-
-    @Override
     public void onStepClick(Step step) {
         String desc = step.getDescription();
         String url = step.getVideoUrl();

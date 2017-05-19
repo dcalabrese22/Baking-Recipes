@@ -41,6 +41,7 @@ public class StepFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mId < mSteps.size() - 1) {
+                    Log.d("NEXT", Integer.toString(mId));
                     mId++;
                     descTextview.setText(mSteps.get(mId).getDescription());
                 }
@@ -51,6 +52,7 @@ public class StepFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mId > 0) {
+                    Log.d("PREV", Integer.toString(mId));
                     mId--;
                     descTextview.setText(mSteps.get(mId).getDescription());
                 }
@@ -67,18 +69,7 @@ public class StepFragment extends Fragment {
         mHandler = (PassRecipeDataHandler) context;
         mSteps = mHandler.passSteps();
         mDescription = getArguments().getString(RecipeDetailActivity.DESC_STEP_EXTRA);
-        if (mDescription == null) {
-            mDescription = mSteps.get(mId).getDescription();
-        }
-
         mVideoUrl = getArguments().getString(RecipeDetailActivity.URL_STEP_EXTRA);
-        if (mVideoUrl == null) {
-            mVideoUrl = mSteps.get(mId).getVideoUrl();
-        }
-
-        if (Integer.valueOf(mId) == null) {
-            mId = getArguments().getInt(RecipeDetailActivity.ID_STEP_EXTRA);
-        }
-        
+        mId = getArguments().getInt(RecipeDetailActivity.ID_STEP_EXTRA);
     }
 }
