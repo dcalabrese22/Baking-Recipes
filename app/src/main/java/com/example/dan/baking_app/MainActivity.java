@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
     public static final String INGREDIENT_EXTRA = "ingredient_extra";
     public static final String STEP_EXTRA = "step_extra";
 
-    private RecipeClickHandler mRecipeClickHandler;
     private MasterListAdapter mAdapter;
 
     @Override

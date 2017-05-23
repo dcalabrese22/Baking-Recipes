@@ -41,8 +41,6 @@ public class RecipeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
 
-        Bundle b = new Bundle();
-
         mRecyclerview = (RecyclerView) rootview.findViewById(R.id.recyclerview_single_recipe);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerview.setLayoutManager(linearLayoutManager);
