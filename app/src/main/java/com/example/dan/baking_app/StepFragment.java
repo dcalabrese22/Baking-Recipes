@@ -52,7 +52,7 @@ public class StepFragment extends Fragment {
     ImageButton mForward;
     ImageButton mBack;
     ProgressBar mProgressbar;
-    long videoPosition;
+    long mVideoPosition;
 
     private static final String STATE_STEPS = "steps";
     private static final String STATE_ID = "id";
@@ -66,77 +66,71 @@ public class StepFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.fragment_step_detail, container, false);
+        mDescTextView = (TextView) rootview.findViewById(R.id.textview_step_description);
+        mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
+
+        mForward = (ImageButton) rootview.findViewById(R.id.imagebutton_next_step);
+        mBack = (ImageButton) rootview.findViewById(R.id.imagebutton_prev_step);
+
+        mPlayerView = (SimpleExoPlayerView) rootview.findViewById(R.id.media_player);
+        mPlayerView.setControllerShowTimeoutMs(1000);
+
         if (savedInstanceState != null) {
+            mVideoUrl = savedInstanceState.getString(STATE_URL);
+            mId = savedInstanceState.getInt(STATE_ID);
+            mDescription = savedInstanceState.getString(STATE_DESCRIPTION);
+            mSteps = savedInstanceState.getParcelableArrayList(STATE_STEPS);
+            mVideoPosition = savedInstanceState.getLong(STATE_VIDEO_POSITION);
+            initializePlayer(mVideoUrl);
+            mExoPlayer.seekTo(mVideoPosition);
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
-                mDescTextView = (TextView) rootview.findViewById(R.id.textview_step_description);
-                mPlayerView = (SimpleExoPlayerView) rootview.findViewById(R.id.media_player);
-                mPlayerView.setControllerShowTimeoutMs(1000);
-                mVideoUrl = savedInstanceState.getString(STATE_URL);
-                mId = savedInstanceState.getInt(STATE_ID);
-                mDescription = savedInstanceState.getString(STATE_DESCRIPTION);
+                mDescTextView.setVisibility(View.VISIBLE);
+
                 mDescTextView.setText(mDescription);
-                mSteps = savedInstanceState.getParcelableArrayList(STATE_STEPS);
-                long position = savedInstanceState.getLong(STATE_VIDEO_POSITION);
-                initializePlayer(mVideoUrl);
-                mExoPlayer.seekTo(position);
+
             } else {
-                mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
-                mPlayerView = (SimpleExoPlayerView) rootview.findViewById(R.id.media_player);
-                mPlayerView.setControllerShowTimeoutMs(1000);
-                mVideoUrl = savedInstanceState.getString(STATE_URL);
-                mId = savedInstanceState.getInt(STATE_ID);
-                long position = savedInstanceState.getLong(STATE_VIDEO_POSITION);
-                initializePlayer(mVideoUrl);
-                mExoPlayer.seekTo(position);
+                mDescTextView.setVisibility(View.GONE);
+                mForward.setVisibility(View.GONE);
+                mBack.setVisibility(View.GONE);
             }
         } else {
+            initializePlayer(mVideoUrl);
+
+            mExoPlayer.addListener(new ExoPlayer.EventListener() {
+                @Override
+                public void onTimelineChanged(Timeline timeline, Object manifest) {}
+
+                @Override
+                public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {}
+
+                @Override
+                public void onLoadingChanged(boolean isLoading) {}
+
+                @Override
+                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                    if (playbackState == ExoPlayer.STATE_BUFFERING) {
+                        mProgressbar.setVisibility(View.VISIBLE);
+                        Log.d("STATE", "BUFFERING");
+                    } else if (playbackState == ExoPlayer.STATE_READY) {
+                        mProgressbar.setVisibility(View.INVISIBLE);
+                        Log.d("STATE", "READY");
+                    }
+                }
+
+                @Override
+                public void onPlayerError(ExoPlaybackException error) {}
+
+                @Override
+                public void onPositionDiscontinuity() {}
+            });
 
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
-                mDescTextView = (TextView) rootview.findViewById(R.id.textview_step_description);
                 mDescTextView.setText(mDescription);
-
-                mPlayerView = (SimpleExoPlayerView) rootview.findViewById(R.id.media_player);
-                mPlayerView.setControllerShowTimeoutMs(1000);
-                initializePlayer(mVideoUrl);
-
-                mExoPlayer.addListener(new ExoPlayer.EventListener() {
-                    @Override
-                    public void onTimelineChanged(Timeline timeline, Object manifest) {}
-
-                    @Override
-                    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {}
-
-                    @Override
-                    public void onLoadingChanged(boolean isLoading) {}
-
-                    @Override
-                    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                        if (playbackState == ExoPlayer.STATE_BUFFERING) {
-                            mProgressbar.setVisibility(View.VISIBLE);
-                            Log.d("STATE", "BUFFERING");
-                        } else if (playbackState == ExoPlayer.STATE_READY) {
-                            mProgressbar.setVisibility(View.INVISIBLE);
-                            Log.d("STATE", "READY");
-                        }
-                    }
-
-                    @Override
-                    public void onPlayerError(ExoPlaybackException error) {}
-
-                    @Override
-                    public void onPositionDiscontinuity() {}
-                });
-
-                mForward = (ImageButton) rootview.findViewById(R.id.imagebutton_next_step);
-                mBack = (ImageButton) rootview.findViewById(R.id.imagebutton_prev_step);
 
                 mForward.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (mId < mSteps.size() - 1) {
-                            Log.d("NEXT", Integer.toString(mId));
                             mId++;
                             mDescTextView.setText(mSteps.get(mId).getDescription());
                             getMovie();
@@ -148,7 +142,6 @@ public class StepFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         if (mId > 0) {
-                            Log.d("PREV", Integer.toString(mId));
                             mId--;
                             mDescTextView.setText(mSteps.get(mId).getDescription());
                             getMovie();
@@ -156,39 +149,8 @@ public class StepFragment extends Fragment {
                     }
                 });
             } else {
-                mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
-
-                mPlayerView = (SimpleExoPlayerView) rootview.findViewById(R.id.media_player);
-                mPlayerView.setControllerShowTimeoutMs(1000);
-                initializePlayer(mVideoUrl);
-
-                mExoPlayer.addListener(new ExoPlayer.EventListener() {
-                    @Override
-                    public void onTimelineChanged(Timeline timeline, Object manifest) {}
-
-                    @Override
-                    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {}
-
-                    @Override
-                    public void onLoadingChanged(boolean isLoading) {}
-
-                    @Override
-                    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                        if (playbackState == ExoPlayer.STATE_BUFFERING) {
-                            mProgressbar.setVisibility(View.VISIBLE);
-                            Log.d("STATE", "BUFFERING");
-                        } else if (playbackState == ExoPlayer.STATE_READY) {
-                            mProgressbar.setVisibility(View.INVISIBLE);
-                            Log.d("STATE", "READY");
-                        }
-                    }
-
-                    @Override
-                    public void onPlayerError(ExoPlaybackException error) {}
-
-                    @Override
-                    public void onPositionDiscontinuity() {}
-                });
+                mForward.setVisibility(View.GONE);
+                mBack.setVisibility(View.GONE);
             }
         }
         return rootview;
@@ -210,10 +172,10 @@ public class StepFragment extends Fragment {
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
             mPlayerView.setPlayer(mExoPlayer);
-            String userAgent = Util.getUserAgent(getContext(), "baking_app");
             if (!url.equals("")) {
                 Uri mediaUri = Uri.parse(url);
                 new LoadVideoTask().execute(mediaUri);
+            } else {
             }
         }
     }
@@ -224,12 +186,7 @@ public class StepFragment extends Fragment {
             return;
         } else {
             Uri mediaUri = Uri.parse(mVideoUrl);
-//            String userAgent = Util.getUserAgent(getContext(), "baking_app");
-//            MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
-//                    new DefaultDataSourceFactory(getContext(), userAgent),
-//                    new DefaultExtractorsFactory(), null, null);
             new LoadVideoTask().execute(mediaUri);
-//            mExoPlayer.setPlayWhenReady(true);
         }
 
     }

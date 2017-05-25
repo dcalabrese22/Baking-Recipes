@@ -47,21 +47,10 @@ public class RecipeDetailActivity extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
 
             fragmentManager.beginTransaction()
-                    .replace(R.id.activity_recipe_detail, mRecipeFragment)
+                    .replace(R.id.activity_recipe_detail, mRecipeFragment, RECIPE_KEY)
                     .commit();
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mStepFragment != null) {
-            getSupportFragmentManager().putFragment(outState, STEP_KEY, mStepFragment);
-        } else {
-            getSupportFragmentManager().putFragment(outState, RECIPE_KEY, mRecipeFragment);
-        }
-
-    }
+     }
 
     @Override
     public ArrayList<Ingredient> passIngredients() {
@@ -88,7 +77,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         mStepFragment = new StepFragment();
         mStepFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment);
+        fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment, STEP_KEY);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
