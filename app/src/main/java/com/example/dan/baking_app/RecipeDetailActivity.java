@@ -1,6 +1,7 @@
 package com.example.dan.baking_app;
 
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -17,6 +18,11 @@ public class RecipeDetailActivity extends AppCompatActivity
     public static final String DESC_STEP_EXTRA = "desc_extra";
     public static final String URL_STEP_EXTRA = "url_extra";
     public static final String ID_STEP_EXTRA = "id_extra";
+    public static final String STEP_KEY = "step_fragment";
+    public static final String RECIPE_KEY = "recipe_fragment";
+
+    StepFragment mStepFragment;
+    RecipeFragment mRecipeFragment;
 
     ArrayList<Ingredient> mIngredients;
     ArrayList<Step> mSteps;
@@ -26,15 +32,25 @@ public class RecipeDetailActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
-        RecipeFragment recipeFragment = new RecipeFragment();
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STEP_KEY)) {
+                mStepFragment = (StepFragment) getSupportFragmentManager()
+                        .getFragment(savedInstanceState, STEP_KEY);
+            } else if (savedInstanceState.containsKey(RECIPE_KEY)) {
+                mRecipeFragment = (RecipeFragment) getSupportFragmentManager()
+                        .getFragment(savedInstanceState, RECIPE_KEY);
+            }
+        } else {
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+            mRecipeFragment = new RecipeFragment();
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.activity_recipe_detail, recipeFragment)
-                .commit();
+            FragmentManager fragmentManager = getSupportFragmentManager();
 
-    }
+            fragmentManager.beginTransaction()
+                    .replace(R.id.activity_recipe_detail, mRecipeFragment, RECIPE_KEY)
+                    .commit();
+        }
+     }
 
     @Override
     public ArrayList<Ingredient> passIngredients() {
@@ -58,12 +74,12 @@ public class RecipeDetailActivity extends AppCompatActivity
         bundle.putString(URL_STEP_EXTRA, url);
         bundle.putInt(ID_STEP_EXTRA, id);
         FragmentManager fragmentManager = getSupportFragmentManager();
-        StepFragment stepFragment = new StepFragment();
-        stepFragment.setArguments(bundle);
-        fragmentManager.beginTransaction()
-                .replace(R.id.activity_recipe_detail, stepFragment)
-                .addToBackStack(null)
-                .commit();
+        mStepFragment = new StepFragment();
+        mStepFragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment, STEP_KEY);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
 
     }
 }

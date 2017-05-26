@@ -27,27 +27,28 @@ public class RecipeFragment extends Fragment {
 
     StepClickHandler mStepClickHandler;
 
+    private static final String SAVED_STATE_INGREDIENTS = "ingredients";
+    private static final String SAVED_STATE_STEPS = "steps";
+
 
     public RecipeFragment() {}
 
-    @Override
-    public void setArguments(Bundle args) {
-        args.getParcelableArrayList(MasterListFragment.INGREDIENT_EXTRA);
-        args.getParcelableArrayList(MasterListFragment.STEP_EXTRA);
-    }
-
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.fragment_recipe_detail, container, false);
-
-        Bundle b = new Bundle();
-
         mRecyclerview = (RecyclerView) rootview.findViewById(R.id.recyclerview_single_recipe);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerview.setLayoutManager(linearLayoutManager);
 
         RecipeAdapter adapter = new RecipeAdapter(mStepClickHandler);
+
+        if (savedInstanceState != null) {
+            mSteps = savedInstanceState.getParcelableArrayList(SAVED_STATE_STEPS);
+            mIngredients = savedInstanceState.getParcelableArrayList(SAVED_STATE_INGREDIENTS);
+        }
+
         adapter.setData(mIngredients, mSteps);
 
         mRecyclerview.setAdapter(adapter);
@@ -55,10 +56,18 @@ public class RecipeFragment extends Fragment {
         return rootview;
     }
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(SAVED_STATE_INGREDIENTS, mIngredients);
+        outState.putParcelableArrayList(SAVED_STATE_STEPS, mSteps);
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mStepClickHandler = (StepClickHandler) getActivity();
+        mStepClickHandler = (StepClickHandler) context;
         mHandler = (PassRecipeDataHandler) context;
         mIngredients = mHandler.passIngredients();
         mSteps = mHandler.passSteps();

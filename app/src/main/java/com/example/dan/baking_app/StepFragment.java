@@ -1,7 +1,9 @@
 package com.example.dan.baking_app;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,19 +12,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
 import com.example.dan.baking_app.objects.Step;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -39,6 +48,17 @@ public class StepFragment extends Fragment {
     PassRecipeDataHandler mHandler;
     SimpleExoPlayerView mPlayerView;
     SimpleExoPlayer mExoPlayer;
+    TextView mDescTextView;
+    ImageButton mForward;
+    ImageButton mBack;
+    ProgressBar mProgressbar;
+    long mVideoPosition;
+
+    private static final String STATE_STEPS = "steps";
+    private static final String STATE_ID = "id";
+    private static final String STATE_URL = "url";
+    private static final String STATE_DESCRIPTION = "description";
+    private static final String STATE_VIDEO_POSITION = "video_position";
 
     public StepFragment(){}
 
@@ -46,41 +66,93 @@ public class StepFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootview = inflater.inflate(R.layout.fragment_step_detail, container, false);
-        final TextView descTextview = (TextView) rootview.findViewById(R.id.textview_step_description);
-        descTextview.setText(mDescription);
+        mDescTextView = (TextView) rootview.findViewById(R.id.textview_step_description);
+        mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
+
+        mForward = (ImageButton) rootview.findViewById(R.id.imagebutton_next_step);
+        mBack = (ImageButton) rootview.findViewById(R.id.imagebutton_prev_step);
 
         mPlayerView = (SimpleExoPlayerView) rootview.findViewById(R.id.media_player);
-        initializePlayer(mVideoUrl);
+        mPlayerView.setControllerShowTimeoutMs(1000);
 
+        if (savedInstanceState != null) {
+            mVideoUrl = savedInstanceState.getString(STATE_URL);
+            mId = savedInstanceState.getInt(STATE_ID);
+            mDescription = savedInstanceState.getString(STATE_DESCRIPTION);
+            mSteps = savedInstanceState.getParcelableArrayList(STATE_STEPS);
+            mVideoPosition = savedInstanceState.getLong(STATE_VIDEO_POSITION);
+            initializePlayer(mVideoUrl);
+            mExoPlayer.seekTo(mVideoPosition);
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                mDescTextView.setVisibility(View.VISIBLE);
 
-        ImageButton forward = (ImageButton) rootview.findViewById(R.id.imagebutton_next_step);
-        ImageButton back = (ImageButton) rootview.findViewById(R.id.imagebutton_prev_step);
+                mDescTextView.setText(mDescription);
 
-        forward.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mId < mSteps.size() - 1) {
-                    Log.d("NEXT", Integer.toString(mId));
-                    mId++;
-                    descTextview.setText(mSteps.get(mId).getDescription());
-                    getMovie();
-                }
+            } else {
+                mDescTextView.setVisibility(View.GONE);
+                mForward.setVisibility(View.GONE);
+                mBack.setVisibility(View.GONE);
             }
-        });
+        } else {
+            initializePlayer(mVideoUrl);
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mId > 0) {
-                    Log.d("PREV", Integer.toString(mId));
-                    mId--;
-                    descTextview.setText(mSteps.get(mId).getDescription());
-                    getMovie();
+            mExoPlayer.addListener(new ExoPlayer.EventListener() {
+                @Override
+                public void onTimelineChanged(Timeline timeline, Object manifest) {}
+
+                @Override
+                public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {}
+
+                @Override
+                public void onLoadingChanged(boolean isLoading) {}
+
+                @Override
+                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                    if (playbackState == ExoPlayer.STATE_BUFFERING) {
+                        mProgressbar.setVisibility(View.VISIBLE);
+                        Log.d("STATE", "BUFFERING");
+                    } else if (playbackState == ExoPlayer.STATE_READY) {
+                        mProgressbar.setVisibility(View.INVISIBLE);
+                        Log.d("STATE", "READY");
+                    }
                 }
+
+                @Override
+                public void onPlayerError(ExoPlaybackException error) {}
+
+                @Override
+                public void onPositionDiscontinuity() {}
+            });
+
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                mDescTextView.setText(mDescription);
+
+                mForward.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mId < mSteps.size() - 1) {
+                            mId++;
+                            mDescTextView.setText(mSteps.get(mId).getDescription());
+                            getMovie();
+                        }
+                    }
+                });
+
+                mBack.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mId > 0) {
+                            mId--;
+                            mDescTextView.setText(mSteps.get(mId).getDescription());
+                            getMovie();
+                        }
+                    }
+                });
+            } else {
+                mForward.setVisibility(View.GONE);
+                mBack.setVisibility(View.GONE);
             }
-        });
-
-
+        }
         return rootview;
     }
 
@@ -100,25 +172,22 @@ public class StepFragment extends Fragment {
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
             mPlayerView.setPlayer(mExoPlayer);
-            String userAgent = Util.getUserAgent(getContext(), "baking_app");
-            Uri mediaUri = Uri.parse(url);
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
-                    new DefaultDataSourceFactory(getContext(), userAgent),
-                    new DefaultExtractorsFactory(), null, null);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
+            if (!url.equals("")) {
+                Uri mediaUri = Uri.parse(url);
+                new LoadVideoTask().execute(mediaUri);
+            } else {
+            }
         }
     }
 
     public void getMovie() {
         mVideoUrl = mSteps.get(mId).getVideoUrl();
-        Uri mediaUri = Uri.parse(mVideoUrl);
-        String userAgent = Util.getUserAgent(getContext(), "baking_app");
-        MediaSource mediaSource = new ExtractorMediaSource(mediaUri,
-                new DefaultDataSourceFactory(getContext(), userAgent),
-                new DefaultExtractorsFactory(), null, null);
-        mExoPlayer.prepare(mediaSource);
-        mExoPlayer.setPlayWhenReady(true);
+        if (mVideoUrl.equals("")) {
+            return;
+        } else {
+            Uri mediaUri = Uri.parse(mVideoUrl);
+            new LoadVideoTask().execute(mediaUri);
+        }
 
     }
 
@@ -130,7 +199,44 @@ public class StepFragment extends Fragment {
 
     public void releasePlayer() {
         mExoPlayer.stop();
+        
         mExoPlayer.release();
         mExoPlayer = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        long position = mExoPlayer.getCurrentPosition();
+        outState.putParcelableArrayList(STATE_STEPS, mSteps);
+        outState.putInt(STATE_ID, mId);
+        outState.putString(STATE_DESCRIPTION, mDescription);
+        outState.putString(STATE_URL, mVideoUrl);
+        outState.putLong(STATE_VIDEO_POSITION, position);
+        super.onSaveInstanceState(outState);
+
+    }
+
+    private class LoadVideoTask extends AsyncTask<Uri, Void, MediaSource> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressbar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected MediaSource doInBackground(Uri... params) {
+            String userAgent = Util.getUserAgent(getContext(), "baking_app");
+            MediaSource mediaSource = new ExtractorMediaSource(params[0],
+                    new DefaultDataSourceFactory(getContext(), userAgent),
+                    new DefaultExtractorsFactory(), null, null);
+            return  mediaSource;
+        }
+
+        @Override
+        protected void onPostExecute(MediaSource mediaSource) {
+            super.onPostExecute(mediaSource);
+            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.setPlayWhenReady(true);
+        }
     }
 }
