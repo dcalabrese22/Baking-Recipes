@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
 import com.example.dan.baking_app.objects.Ingredient;
+import com.example.dan.baking_app.objects.Recipe;
 import com.example.dan.baking_app.objects.Step;
 
 import java.util.ArrayList;
@@ -27,30 +28,54 @@ public class RecipeDetailActivity extends AppCompatActivity
     ArrayList<Ingredient> mIngredients;
     ArrayList<Step> mSteps;
 
+    private boolean mTwoPane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(STEP_KEY)) {
-                mStepFragment = (StepFragment) getSupportFragmentManager()
-                        .getFragment(savedInstanceState, STEP_KEY);
-            } else if (savedInstanceState.containsKey(RECIPE_KEY)) {
-                mRecipeFragment = (RecipeFragment) getSupportFragmentManager()
-                        .getFragment(savedInstanceState, RECIPE_KEY);
+        if (findViewById(R.id.two_pane) != null) {
+            mTwoPane = true;
+            if (savedInstanceState != null) {
+                if (savedInstanceState.containsKey(STEP_KEY)) {
+                    mStepFragment = (StepFragment) getSupportFragmentManager()
+                            .getFragment(savedInstanceState, STEP_KEY);
+                } else if (savedInstanceState.containsKey(RECIPE_KEY)) {
+                    mRecipeFragment = (RecipeFragment) getSupportFragmentManager()
+                            .getFragment(savedInstanceState, RECIPE_KEY);
+                } else {
+
+                    mRecipeFragment = new RecipeFragment();
+
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.recipe_list_container, mRecipeFragment, RECIPE_KEY)
+                            .commit();
+                }
             }
+
         } else {
+            mTwoPane = false;
+            if (savedInstanceState != null) {
+                if (savedInstanceState.containsKey(STEP_KEY)) {
+                    mStepFragment = (StepFragment) getSupportFragmentManager()
+                            .getFragment(savedInstanceState, STEP_KEY);
+                } else if (savedInstanceState.containsKey(RECIPE_KEY)) {
+                    mRecipeFragment = (RecipeFragment) getSupportFragmentManager()
+                            .getFragment(savedInstanceState, RECIPE_KEY);
+                }
+            } else {
 
-            mRecipeFragment = new RecipeFragment();
+                mRecipeFragment = new RecipeFragment();
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
 
-            fragmentManager.beginTransaction()
-                    .replace(R.id.activity_recipe_detail, mRecipeFragment, RECIPE_KEY)
-                    .commit();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.activity_recipe_detail, mRecipeFragment, RECIPE_KEY)
+                        .commit();
+            }
         }
-     }
+    }
 
     @Override
     public ArrayList<Ingredient> passIngredients() {
@@ -66,6 +91,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public void onStepClick(Step step) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
         String desc = step.getDescription();
         String url = step.getVideoUrl();
         int id = step.getId();
@@ -73,13 +99,17 @@ public class RecipeDetailActivity extends AppCompatActivity
         bundle.putString(DESC_STEP_EXTRA, desc);
         bundle.putString(URL_STEP_EXTRA, url);
         bundle.putInt(ID_STEP_EXTRA, id);
-        FragmentManager fragmentManager = getSupportFragmentManager();
         mStepFragment = new StepFragment();
         mStepFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment, STEP_KEY);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        if (mTwoPane) {
+            fragmentTransaction.replace(R.id.step_container, mStepFragment, STEP_KEY);
+            fragmentTransaction.commit();
+        } else {
+            fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment, STEP_KEY);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
 
     }
 }
