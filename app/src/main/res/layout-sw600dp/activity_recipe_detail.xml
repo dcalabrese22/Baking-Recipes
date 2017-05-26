@@ -7,14 +7,19 @@
     android:id="@+id/two_pane">
     
     <FrameLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:id="@+id/recipe_list_container"/>
 
+
     <FrameLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="2"
         android:id="@+id/step_container"/>
+
+
 
 
 </LinearLayout>

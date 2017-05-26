@@ -53,6 +53,7 @@ public class StepFragment extends Fragment {
     ImageButton mBack;
     ProgressBar mProgressbar;
     long mVideoPosition;
+    boolean mTwoPane;
 
     private static final String STATE_STEPS = "steps";
     private static final String STATE_ID = "id";
@@ -77,6 +78,7 @@ public class StepFragment extends Fragment {
         mPlayerView = (SimpleExoPlayerView) rootview.findViewById(R.id.media_player);
         mPlayerView.setControllerShowTimeoutMs(1000);
 
+
         if (savedInstanceState != null) {
             mVideoUrl = savedInstanceState.getString(STATE_URL);
             mId = savedInstanceState.getInt(STATE_ID);
@@ -86,7 +88,8 @@ public class StepFragment extends Fragment {
             initializePlayer(mVideoUrl);
             mExoPlayer.addListener(new MyExoPlayerStateListener());
             mExoPlayer.seekTo(mVideoPosition);
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (getResources().getConfiguration().orientation ==
+                    Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
                 mDescTextView.setVisibility(View.VISIBLE);
 
                 mDescTextView.setText(mDescription);
@@ -122,7 +125,8 @@ public class StepFragment extends Fragment {
 
             mExoPlayer.addListener(new MyExoPlayerStateListener());
 
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (getResources().getConfiguration().orientation ==
+                    Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
                 mDescTextView.setText(mDescription);
 
                 mForward.setOnClickListener(new View.OnClickListener() {
@@ -162,6 +166,7 @@ public class StepFragment extends Fragment {
         mDescription = getArguments().getString(RecipeDetailActivity.DESC_STEP_EXTRA);
         mVideoUrl = getArguments().getString(RecipeDetailActivity.URL_STEP_EXTRA);
         mId = getArguments().getInt(RecipeDetailActivity.ID_STEP_EXTRA);
+        mTwoPane = getArguments().getBoolean(RecipeDetailActivity.TWO_PANE_EXTRA);
     }
 
     public void initializePlayer(String url) {

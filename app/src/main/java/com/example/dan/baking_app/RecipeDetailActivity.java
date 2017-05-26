@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
@@ -19,6 +20,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     public static final String DESC_STEP_EXTRA = "desc_extra";
     public static final String URL_STEP_EXTRA = "url_extra";
     public static final String ID_STEP_EXTRA = "id_extra";
+    public static final String TWO_PANE_EXTRA = "two_pane_extra";
     public static final String STEP_KEY = "step_fragment";
     public static final String RECIPE_KEY = "recipe_fragment";
 
@@ -37,26 +39,27 @@ public class RecipeDetailActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         if (findViewById(R.id.two_pane) != null) {
+            Log.d("TWO PANE", "IN TWO PANE");
             mTwoPane = true;
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(STEP_KEY)) {
                     mStepFragment = (StepFragment) getSupportFragmentManager()
                             .getFragment(savedInstanceState, STEP_KEY);
-                } else if (savedInstanceState.containsKey(RECIPE_KEY)) {
+                } else {
                     mRecipeFragment = (RecipeFragment) getSupportFragmentManager()
                             .getFragment(savedInstanceState, RECIPE_KEY);
-                } else {
-
-                    mRecipeFragment = new RecipeFragment();
-
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.recipe_list_container, mRecipeFragment, RECIPE_KEY)
-                            .commit();
                 }
-            }
+            } else {
 
-        } else {
+                mRecipeFragment = new RecipeFragment();
+
+                fragmentManager.beginTransaction()
+                        .replace(R.id.recipe_list_container, mRecipeFragment, RECIPE_KEY)
+                        .commit();
+            }
+            } else {
             mTwoPane = false;
+            Log.d("TWO PANE", "NOT IN TWO PANE");
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(STEP_KEY)) {
                     mStepFragment = (StepFragment) getSupportFragmentManager()
@@ -99,11 +102,12 @@ public class RecipeDetailActivity extends AppCompatActivity
         bundle.putString(DESC_STEP_EXTRA, desc);
         bundle.putString(URL_STEP_EXTRA, url);
         bundle.putInt(ID_STEP_EXTRA, id);
+        bundle.putBoolean(TWO_PANE_EXTRA, mTwoPane);
         mStepFragment = new StepFragment();
         mStepFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (mTwoPane) {
-            fragmentTransaction.replace(R.id.step_container, mStepFragment, STEP_KEY);
+            fragmentTransaction.add(R.id.step_container, mStepFragment, STEP_KEY);
             fragmentTransaction.commit();
         } else {
             fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment, STEP_KEY);
