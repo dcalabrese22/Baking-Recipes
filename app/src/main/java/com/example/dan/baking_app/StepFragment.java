@@ -1,12 +1,13 @@
 package com.example.dan.baking_app;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,8 +62,6 @@ public class StepFragment extends Fragment {
     private static final String STATE_DESCRIPTION = "description";
     private static final String STATE_VIDEO_POSITION = "video_position";
 
-    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
-
     public StepFragment(){}
 
     @Nullable
@@ -80,6 +79,10 @@ public class StepFragment extends Fragment {
 
 
         if (savedInstanceState != null) {
+//            mPlayerView.setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             mVideoUrl = savedInstanceState.getString(STATE_URL);
             mId = savedInstanceState.getInt(STATE_ID);
             mDescription = savedInstanceState.getString(STATE_DESCRIPTION);
@@ -119,14 +122,28 @@ public class StepFragment extends Fragment {
                 mDescTextView.setVisibility(View.GONE);
                 mForward.setVisibility(View.GONE);
                 mBack.setVisibility(View.GONE);
+                mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
             }
         } else {
             initializePlayer(mVideoUrl);
-
+//            mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             mExoPlayer.addListener(new MyExoPlayerStateListener());
+
 
             if (getResources().getConfiguration().orientation ==
                     Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
+//                mPlayerView.setSystemUiVisibility(
+//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
                 mDescTextView.setText(mDescription);
 
                 mForward.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +170,13 @@ public class StepFragment extends Fragment {
             } else {
                 mForward.setVisibility(View.GONE);
                 mBack.setVisibility(View.GONE);
+                mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
             }
         }
         return rootview;
@@ -164,6 +188,7 @@ public class StepFragment extends Fragment {
         mHandler = (PassRecipeDataHandler) context;
         mSteps = mHandler.passSteps();
         mDescription = getArguments().getString(RecipeDetailActivity.DESC_STEP_EXTRA);
+
         mVideoUrl = getArguments().getString(RecipeDetailActivity.URL_STEP_EXTRA);
         mId = getArguments().getInt(RecipeDetailActivity.ID_STEP_EXTRA);
         mTwoPane = getArguments().getBoolean(RecipeDetailActivity.TWO_PANE_EXTRA);
@@ -179,6 +204,8 @@ public class StepFragment extends Fragment {
             if (!url.equals("")) {
                 Uri mediaUri = Uri.parse(url);
                 mExoPlayer.prepare(buildMediaSource(mediaUri), true, true);
+            } else {
+                mPlayerView.setVisibility(View.GONE);
             }
         }
     }

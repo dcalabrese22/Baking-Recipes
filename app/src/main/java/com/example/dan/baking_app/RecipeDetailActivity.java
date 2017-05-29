@@ -1,15 +1,18 @@
 package com.example.dan.baking_app;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
 import com.example.dan.baking_app.objects.Ingredient;
-import com.example.dan.baking_app.objects.Recipe;
 import com.example.dan.baking_app.objects.Step;
 
 import java.util.ArrayList;
@@ -31,22 +34,37 @@ public class RecipeDetailActivity extends AppCompatActivity
     ArrayList<Step> mSteps;
 
     private boolean mTwoPane;
+    Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setMyTitle();
+        setSupportActionBar(mToolbar);
 
+        View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int i) {
+                if ((i & View.SYSTEM_UI_FLAG_FULLSCREEN) == View.VISIBLE) {
+                    getSupportActionBar().show();
+                } else {
+                    getSupportActionBar().hide();
+                }
+            }
+        });
+        FragmentManager fragmentManager = getFragmentManager();
         if (findViewById(R.id.two_pane) != null) {
             Log.d("TWO PANE", "IN TWO PANE");
             mTwoPane = true;
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(STEP_KEY)) {
-                    mStepFragment = (StepFragment) getSupportFragmentManager()
+                    mStepFragment = (StepFragment) getFragmentManager()
                             .getFragment(savedInstanceState, STEP_KEY);
                 } else {
-                    mRecipeFragment = (RecipeFragment) getSupportFragmentManager()
+                    mRecipeFragment = (RecipeFragment) getFragmentManager()
                             .getFragment(savedInstanceState, RECIPE_KEY);
                 }
             } else {
@@ -62,10 +80,10 @@ public class RecipeDetailActivity extends AppCompatActivity
             Log.d("TWO PANE", "NOT IN TWO PANE");
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(STEP_KEY)) {
-                    mStepFragment = (StepFragment) getSupportFragmentManager()
+                    mStepFragment = (StepFragment) getFragmentManager()
                             .getFragment(savedInstanceState, STEP_KEY);
                 } else if (savedInstanceState.containsKey(RECIPE_KEY)) {
-                    mRecipeFragment = (RecipeFragment) getSupportFragmentManager()
+                    mRecipeFragment = (RecipeFragment) getFragmentManager()
                             .getFragment(savedInstanceState, RECIPE_KEY);
                 }
             } else {
@@ -77,6 +95,14 @@ public class RecipeDetailActivity extends AppCompatActivity
                         .replace(R.id.activity_recipe_detail, mRecipeFragment, RECIPE_KEY)
                         .commit();
             }
+        }
+    }
+
+    public void setMyTitle() {
+        if (mTwoPane) {
+            mToolbar.setTitle(getResources().getString(R.string.app_name));
+        } else {
+            mToolbar.setTitle(getIntent().getExtras().getString(MainActivity.RECIPE_NAME_EXTRA));
         }
     }
 
@@ -94,7 +120,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     @Override
     public void onStepClick(Step step) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getFragmentManager();
         String desc = step.getDescription();
         String url = step.getVideoUrl();
         int id = step.getId();

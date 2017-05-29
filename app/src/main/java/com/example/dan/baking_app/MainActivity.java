@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
 
     public static final String INGREDIENT_EXTRA = "ingredient_extra";
     public static final String STEP_EXTRA = "step_extra";
+    public static final String RECIPE_NAME_EXTRA = "name_extra";
 
     private MasterListAdapter mAdapter;
 
@@ -31,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
+        tb.setTitle(getResources().getString(R.string.app_name));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_recipe_list);
 
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
 
         Intent intent = new Intent(this, RecipeDetailActivity.class);
         Bundle b = new Bundle();
-
+        b.putString(RECIPE_NAME_EXTRA, recipe.getName());
         b.putParcelableArrayList(INGREDIENT_EXTRA, ingredients);
         b.putParcelableArrayList(STEP_EXTRA, steps);
         intent.putExtras(b);
