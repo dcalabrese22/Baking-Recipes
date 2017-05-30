@@ -57,7 +57,6 @@ public class RecipeDetailActivity extends AppCompatActivity
         });
         FragmentManager fragmentManager = getFragmentManager();
         if (findViewById(R.id.two_pane) != null) {
-            Log.d("TWO PANE", "IN TWO PANE");
             mTwoPane = true;
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(STEP_KEY)) {
@@ -77,7 +76,6 @@ public class RecipeDetailActivity extends AppCompatActivity
             }
             } else {
             mTwoPane = false;
-            Log.d("TWO PANE", "NOT IN TWO PANE");
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(STEP_KEY)) {
                     mStepFragment = (StepFragment) getFragmentManager()

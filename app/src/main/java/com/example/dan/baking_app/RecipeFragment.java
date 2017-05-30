@@ -2,6 +2,7 @@ package com.example.dan.baking_app;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,10 +54,16 @@ public class RecipeFragment extends Fragment {
 
         mRecyclerview.setAdapter(adapter);
 
+        broadcast();
         return rootview;
 
     }
 
+    public void broadcast() {
+        Intent intent = new Intent(BakingWidgetProvider.EXTRA_ITEM);
+        intent.putParcelableArrayListExtra("ingredients", mIngredients);
+        getActivity().getApplicationContext().sendBroadcast(intent);
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
