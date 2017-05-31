@@ -1,12 +1,14 @@
 package com.example.dan.baking_app;
 
 import android.app.Fragment;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,9 +62,11 @@ public class RecipeFragment extends Fragment {
     }
 
     public void broadcast() {
-        Intent intent = new Intent(BakingWidgetProvider.EXTRA_ITEM);
+        Intent intent = new Intent();
         intent.putParcelableArrayListExtra("ingredients", mIngredients);
-        getActivity().getApplicationContext().sendBroadcast(intent);
+        intent.setAction(BakingWidgetProvider.WIDGET_INTENT);
+        getActivity().sendBroadcast(intent);
+        Log.d("Recipe Fragment", "Broadcasted ingredients " + mIngredients.toString());
     }
 
     @Override

@@ -19,12 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RecipeDetailActivity"/>
+        <activity android:name=".RecipeDetailActivity" />
 
         <receiver android:name=".BakingWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.example.dan.baking_app.EXTRA_ITEM"/>
+                <action android:name="com.example.dan.baking_app.EXTRA_ITEM" />
             </intent-filter>
 
             <meta-data
@@ -32,8 +32,19 @@
                 android:resource="@xml/baking_widget_provider_info" />
         </receiver>
 
-        <service android:name=".WidgetAdapterService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+        <service
+            android:name=".WidgetAdapterService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver
+            android:name=".WidgetRemoteViewsFactoryReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="com.example.dan.baking_app.GET_WIDGET_DATA" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
