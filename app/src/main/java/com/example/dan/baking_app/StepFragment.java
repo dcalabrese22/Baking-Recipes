@@ -2,6 +2,7 @@ package com.example.dan.baking_app;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -55,12 +57,16 @@ public class StepFragment extends Fragment {
     ProgressBar mProgressbar;
     long mVideoPosition;
     boolean mTwoPane;
+    Button mUpdateWidget;
 
     private static final String STATE_STEPS = "steps";
     private static final String STATE_ID = "id";
     private static final String STATE_URL = "url";
     private static final String STATE_DESCRIPTION = "description";
     private static final String STATE_VIDEO_POSITION = "video_position";
+
+    public static final String UPDATE_WIDGET_BUTTON
+            = "com.example.dan.baking_app.ACTION_UPDATE_WIDGET_FROM_BUTTON";
 
     public StepFragment(){}
 
@@ -71,6 +77,7 @@ public class StepFragment extends Fragment {
         mDescTextView = (TextView) rootview.findViewById(R.id.textview_step_description);
         mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
 
+        mUpdateWidget = (Button) rootview.findViewById(R.id.button_widget_update);
         mForward = (ImageButton) rootview.findViewById(R.id.imagebutton_next_step);
         mBack = (ImageButton) rootview.findViewById(R.id.imagebutton_prev_step);
 
@@ -145,6 +152,14 @@ public class StepFragment extends Fragment {
 //                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 //                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
                 mDescTextView.setText(mDescription);
+
+                mUpdateWidget.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent updateWidget = new Intent(UPDATE_WIDGET_BUTTON);
+                        getContext().sendBroadcast(updateWidget);
+                    }
+                });
 
                 mForward.setOnClickListener(new View.OnClickListener() {
                     @Override

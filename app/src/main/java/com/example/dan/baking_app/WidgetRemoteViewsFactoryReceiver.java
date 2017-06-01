@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -40,7 +41,11 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public int getCount() {
-        return sIngredients.size();
+        if (sIngredients != null) {
+            return sIngredients.size();
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -76,12 +81,13 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
         rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
         rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
 
-//            Bundle extras = new Bundle();
-//            extras.putInt(BakingWidgetProvider.WIDGET_INTENT, position);
-//            Intent fillInIntent = new Intent();
-//            fillInIntent.putExtras(extras);
-//            rv.setOnClickFillInIntent(R.id.recipe_ingredient, fillInIntent);
-        Log.d(TAG, "getViewAt: Called");
+        Bundle extras = new Bundle();
+        extras.putInt(BakingWidgetProvider.WIDGET_ROW_EXTRA, position);
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtras(extras);
+        fillInIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+
+        rv.setOnClickFillInIntent(R.id.recipe_ingredient, fillInIntent);
         return rv;
     }
 
@@ -93,6 +99,7 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy: called");
         if (sIngredients != null) {
             sIngredients.clear();
         }
@@ -117,7 +124,9 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "onReceive: Called");
-        sIngredients = intent.getParcelableArrayListExtra("ingredients");
+        if (intent.getAction().equals(BakingWidgetProvider.WIDGET_INGREDIENT_DATA_ACTION)) {
+            sIngredients = intent.getParcelableArrayListExtra("ingredients");
+        }
         if (sIngredients != null) {
             Log.d(TAG, "onReceive: " + sIngredients.toString());
         }

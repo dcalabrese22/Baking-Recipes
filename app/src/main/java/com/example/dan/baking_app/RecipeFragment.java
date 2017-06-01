@@ -64,7 +64,7 @@ public class RecipeFragment extends Fragment {
     public void broadcast() {
         Intent intent = new Intent();
         intent.putParcelableArrayListExtra("ingredients", mIngredients);
-        intent.setAction(BakingWidgetProvider.WIDGET_INTENT);
+        intent.setAction(BakingWidgetProvider.WIDGET_EXTRA_INTENT);
         getActivity().sendBroadcast(intent);
         Log.d("Recipe Fragment", "Broadcasted ingredients " + mIngredients.toString());
     }

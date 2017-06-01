@@ -23,17 +23,27 @@ public class BakingWidgetProvider extends AppWidgetProvider {
     public static final String WIDGET_INGREDIENT_DATA_ACTION
             = "com.example.dan.baking_app.GET_WIDGET_DATA";
 
+    public static final String WIDGET_ROW_ACTION = "com.example.dan.baking_app.WIDGET_ROW_ACTION";
+    public static final String WIDGET_ROW_EXTRA = "com.example.dan.baking_app.WIDGET_ROW_EXTRA";
 
-    public static final String WIDGET_INTENT = "com.example.dan.baking_app.EXTRA_ITEM";
+    public static final String WIDGET_EXTRA_INTENT = "com.example.dan.baking_app.EXTRA_ITEM";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId, RemoteViews rv) {
+                                int appWidgetId) {
 
         Intent intent = new Intent(context, WidgetAdapterService.class);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Construct the RemoteViews object
+        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
 
         rv.setRemoteAdapter(R.id.widget_listview, intent);
         rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
+
+        Intent openStep = new Intent(context, RecipeDetailActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openStep, 0);
+        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
+        Log.d("updateAppWidgetMethod: ", "called");
 
 //        appWidgetManager.updateAppWidget(thisWidget, rv);
         // Instruct the widget manager to update the widget
@@ -44,16 +54,9 @@ public class BakingWidgetProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId, rv);
+            updateAppWidget(context, appWidgetManager, appWidgetId);
         }
-        Intent updateIntent = new Intent();
-        updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        updateIntent.putExtra("key", appWidgetIds);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, updateIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
@@ -77,7 +80,6 @@ public class BakingWidgetProvider extends AppWidgetProvider {
                     intent.getParcelableArrayListExtra("ingredients"));
             context.sendBroadcast(newIntent);
         }
-
     }
 
 }
