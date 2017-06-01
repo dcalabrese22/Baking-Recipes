@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
         implements RemoteViewsService.RemoteViewsFactory{
 
+    private final String TAG = "Factory Receiver";
     private Context mContext;
     private static ArrayList<Ingredient> sIngredients;
     ArrayList<String> strings = new ArrayList<>();
@@ -30,55 +31,63 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public void onCreate() {
+        Log.d(TAG, "onCreate: Called");
         initData();
         if (sIngredients != null) {
-            Log.d("Ingredients", sIngredients.toString());
+            Log.d(TAG, "onCreate: " + sIngredients.toString());
         }
     }
 
     @Override
     public int getCount() {
-        return strings.size();
+        return sIngredients.size();
     }
 
     @Override
     public void onDataSetChanged() {
-        strings.clear();
-        initData();
+        Log.d(TAG, "onDataSetChanged: Called");
+
     }
 
     @Override
     public int getViewTypeCount() {
+        Log.d(TAG, "getViewTypeCount: Called");
         return 1;
+    }
+
+    public String getIngredientQuantity(Ingredient ingredient) {
+        DecimalFormat df = new DecimalFormat("####.#");
+        String quantityStr = df.format(ingredient.getQuantity());
+        if (ingredient.getMeasure().equals("UNIT")) {
+            return quantityStr;
+        } else {
+            String qAndMeasure = quantityStr + " " + ingredient.getMeasure().toLowerCase();
+            return qAndMeasure;
+        }
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget);
-        rv.setTextViewText(R.id.widget_quantity, strings.get(position));
-        rv.setTextViewText(R.id.widget_ingredient_name, strings.get(position));
-//        Ingredient ingredient = sIngredients.get(position);
-//        DecimalFormat df = new DecimalFormat("####.#");
-//        String quantityStr = df.format(ingredient.getQuantity());
-//        if (ingredient.getMeasure().equals("UNIT")) {
-//            rv.setTextViewText(R.id.textview_recipe_quantity, quantityStr);
-//        } else {
-//            String qAndMeasure = quantityStr + " " + ingredient.getMeasure().toLowerCase();
-//            rv.setTextViewText(R.id.textview_recipe_quantity, qAndMeasure);
-//        }
-//        rv.setTextViewText(R.id.textview_recipe_name, ingredient.getName());
+//        rv.setTextViewText(R.id.widget_quantity, strings.get(position));
+//        rv.setTextViewText(R.id.widget_ingredient_name, strings.get(position));
+        Ingredient ingredient = sIngredients.get(position);
+        Log.d(TAG, "getViewAt: " + ingredient.getName());
+        rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
+        rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
 
 //            Bundle extras = new Bundle();
 //            extras.putInt(BakingWidgetProvider.WIDGET_INTENT, position);
 //            Intent fillInIntent = new Intent();
 //            fillInIntent.putExtras(extras);
 //            rv.setOnClickFillInIntent(R.id.recipe_ingredient, fillInIntent);
-        Log.d("getViewAt", "CALLED");
+        Log.d(TAG, "getViewAt: Called");
         return rv;
     }
 
     @Override
     public long getItemId(int position) {
+        Log.d(TAG, "getItemId: Called");
         return position;
     }
 
@@ -107,9 +116,10 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive: Called");
         sIngredients = intent.getParcelableArrayListExtra("ingredients");
         if (sIngredients != null) {
-            Log.d("getRecipeIngredients", "Got Ingredients " + sIngredients.toString());
+            Log.d(TAG, "onReceive: " + sIngredients.toString());
         }
     }
 }
