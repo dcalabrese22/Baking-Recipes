@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -28,22 +29,29 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     public static final String WIDGET_EXTRA_INTENT = "com.example.dan.baking_app.EXTRA_ITEM";
 
+    public String mRecipeName;
+    public static Intent mIntent;
+
+
+
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                                int appWidgetId, String name) {
+        Log.d("updateAppWidgetMethod: ", "called");
 
         Intent intent = new Intent(context, WidgetAdapterService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Construct the RemoteViews object
+
+
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
 
         rv.setRemoteAdapter(R.id.widget_listview, intent);
         rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
 
-        Intent openStep = new Intent(context, RecipeDetailActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openStep, 0);
-        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
-        Log.d("updateAppWidgetMethod: ", "called");
+//        Intent openStep = new Intent(context, RecipeDetailActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openStep, 0);
+//        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
 
 //        appWidgetManager.updateAppWidget(thisWidget, rv);
         // Instruct the widget manager to update the widget
@@ -53,9 +61,9 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
+        Log.d("onUpdate", "Recipe name = " + mRecipeName);
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+            updateAppWidget(context, appWidgetManager, appWidgetId, mRecipeName);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
@@ -72,14 +80,18 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
         if (intent.getParcelableArrayListExtra("ingredients") != null) {
+            mRecipeName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
+
+            Log.d("Recipe name: ", mRecipeName);
             Intent newIntent = new Intent();
             newIntent.setAction(WIDGET_INGREDIENT_DATA_ACTION);
+            newIntent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
             newIntent.putParcelableArrayListExtra("ingredients",
                     intent.getParcelableArrayListExtra("ingredients"));
             context.sendBroadcast(newIntent);
         }
+        super.onReceive(context, intent);
     }
 
 }

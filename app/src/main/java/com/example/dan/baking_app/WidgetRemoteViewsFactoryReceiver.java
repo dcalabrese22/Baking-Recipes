@@ -23,6 +23,7 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
     private Context mContext;
     private static ArrayList<Ingredient> sIngredients;
     ArrayList<String> strings = new ArrayList<>();
+    private String mRecipenName;
 
     public WidgetRemoteViewsFactoryReceiver(){}
 
@@ -57,7 +58,7 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
     @Override
     public int getViewTypeCount() {
         Log.d(TAG, "getViewTypeCount: Called");
-        return 1;
+        return 2;
     }
 
     public String getIngredientQuantity(Ingredient ingredient) {
@@ -73,22 +74,27 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public RemoteViews getViewAt(int position) {
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget);
-//        rv.setTextViewText(R.id.widget_quantity, strings.get(position));
-//        rv.setTextViewText(R.id.widget_ingredient_name, strings.get(position));
-        Ingredient ingredient = sIngredients.get(position);
-        Log.d(TAG, "getViewAt: " + ingredient.getName());
-        rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
-        rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
+        if (position == 0) {
+            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.baking_widget_provider);
+            rv.setTextViewText(R.id.widget_recipe_title, "test");
+            Log.d(TAG, "getViewAt: " + mRecipenName);
+            return rv;
+        } else {
+            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget);
+            Ingredient ingredient = sIngredients.get(position);
+            Log.d(TAG, "getViewAt: " + ingredient.getName());
+            rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
+            rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
 
-        Bundle extras = new Bundle();
-        extras.putInt(BakingWidgetProvider.WIDGET_ROW_EXTRA, position);
-        Intent fillInIntent = new Intent();
-        fillInIntent.putExtras(extras);
-        fillInIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            Bundle extras = new Bundle();
+            extras.putInt(BakingWidgetProvider.WIDGET_ROW_EXTRA, position);
+            Intent fillInIntent = new Intent();
+            fillInIntent.putExtras(extras);
+            fillInIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 
-        rv.setOnClickFillInIntent(R.id.recipe_ingredient, fillInIntent);
-        return rv;
+            rv.setOnClickFillInIntent(R.id.recipe_ingredient, fillInIntent);
+            return rv;
+        }
     }
 
     @Override
@@ -126,9 +132,8 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
         Log.d(TAG, "onReceive: Called");
         if (intent.getAction().equals(BakingWidgetProvider.WIDGET_INGREDIENT_DATA_ACTION)) {
             sIngredients = intent.getParcelableArrayListExtra("ingredients");
-        }
-        if (sIngredients != null) {
-            Log.d(TAG, "onReceive: " + sIngredients.toString());
+            mRecipenName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
+            Log.d(TAG, "mRecipeName: " + mRecipenName);
         }
     }
 }

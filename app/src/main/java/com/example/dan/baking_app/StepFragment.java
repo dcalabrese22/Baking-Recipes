@@ -233,11 +233,11 @@ public class StepFragment extends Fragment {
 
     public void getMovie() {
         mVideoUrl = mSteps.get(mId).getVideoUrl();
-        if (mVideoUrl.equals("")) {
-            return;
-        } else {
+        if (!mVideoUrl.equals("")) {
             Uri mediaUri = Uri.parse(mVideoUrl);
-            new LoadVideoTask().execute(mediaUri);
+            mExoPlayer.prepare(buildMediaSource(mediaUri), true, true);
+        } else {
+            mPlayerView.setVisibility(View.GONE);
         }
 
     }
@@ -267,29 +267,29 @@ public class StepFragment extends Fragment {
 
     }
 
-    private class LoadVideoTask extends AsyncTask<Uri, Void, MediaSource> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressbar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected MediaSource doInBackground(Uri... params) {
-            String userAgent = Util.getUserAgent(getContext(), "baking_app");
-            MediaSource mediaSource = new ExtractorMediaSource(params[0],
-                    new DefaultDataSourceFactory(getContext(), userAgent),
-                    new DefaultExtractorsFactory(), null, null);
-            return  mediaSource;
-        }
-
-        @Override
-        protected void onPostExecute(MediaSource mediaSource) {
-            super.onPostExecute(mediaSource);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
-        }
-    }
+//    private class LoadVideoTask extends AsyncTask<Uri, Void, MediaSource> {
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            mProgressbar.setVisibility(View.VISIBLE);
+//        }
+//
+//        @Override
+//        protected MediaSource doInBackground(Uri... params) {
+//            String userAgent = Util.getUserAgent(getContext(), "baking_app");
+//            MediaSource mediaSource = new ExtractorMediaSource(params[0],
+//                    new DefaultDataSourceFactory(getContext(), userAgent),
+//                    new DefaultExtractorsFactory(), null, null);
+//            return  mediaSource;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(MediaSource mediaSource) {
+//            super.onPostExecute(mediaSource);
+//            mExoPlayer.prepare(mediaSource);
+//            mExoPlayer.setPlayWhenReady(true);
+//        }
+//    }
 
     private class MyExoPlayerStateListener implements ExoPlayer.EventListener {
         @Override

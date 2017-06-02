@@ -24,6 +24,7 @@ public class RecipeFragment extends Fragment {
 
     ArrayList<Ingredient> mIngredients;
     ArrayList<Step> mSteps;
+    String mRecipeName;
 
     RecyclerView mRecyclerview;
     PassRecipeDataHandler mHandler;
@@ -63,10 +64,10 @@ public class RecipeFragment extends Fragment {
 
     public void broadcast() {
         Intent intent = new Intent();
+        intent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
         intent.putParcelableArrayListExtra("ingredients", mIngredients);
         intent.setAction(BakingWidgetProvider.WIDGET_EXTRA_INTENT);
         getActivity().sendBroadcast(intent);
-        Log.d("Recipe Fragment", "Broadcasted ingredients " + mIngredients.toString());
     }
 
     @Override
@@ -81,6 +82,7 @@ public class RecipeFragment extends Fragment {
         super.onAttach(context);
         mStepClickHandler = (StepClickHandler) context;
         mHandler = (PassRecipeDataHandler) context;
+        mRecipeName = mHandler.passRecipeName();
         mIngredients = mHandler.passIngredients();
         mSteps = mHandler.passSteps();
     }

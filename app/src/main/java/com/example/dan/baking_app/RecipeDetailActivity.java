@@ -117,6 +117,11 @@ public class RecipeDetailActivity extends AppCompatActivity
     }
 
     @Override
+    public String passRecipeName() {
+        return getIntent().getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
+    }
+
+    @Override
     public void onStepClick(Step step) {
         FragmentManager fragmentManager = getFragmentManager();
         String desc = step.getDescription();
