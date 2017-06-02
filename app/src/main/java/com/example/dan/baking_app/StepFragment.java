@@ -57,7 +57,6 @@ public class StepFragment extends Fragment {
     ProgressBar mProgressbar;
     long mVideoPosition;
     boolean mTwoPane;
-    Button mUpdateWidget;
 
     private static final String STATE_STEPS = "steps";
     private static final String STATE_ID = "id";
@@ -77,7 +76,6 @@ public class StepFragment extends Fragment {
         mDescTextView = (TextView) rootview.findViewById(R.id.textview_step_description);
         mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
 
-        mUpdateWidget = (Button) rootview.findViewById(R.id.button_widget_update);
         mForward = (ImageButton) rootview.findViewById(R.id.imagebutton_next_step);
         mBack = (ImageButton) rootview.findViewById(R.id.imagebutton_prev_step);
 
@@ -86,10 +84,7 @@ public class StepFragment extends Fragment {
 
 
         if (savedInstanceState != null) {
-//            mPlayerView.setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
             mVideoUrl = savedInstanceState.getString(STATE_URL);
             mId = savedInstanceState.getInt(STATE_ID);
             mDescription = savedInstanceState.getString(STATE_DESCRIPTION);
@@ -139,27 +134,13 @@ public class StepFragment extends Fragment {
             }
         } else {
             initializePlayer(mVideoUrl);
-//            mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            mExoPlayer.addListener(new MyExoPlayerStateListener());
 
+            mExoPlayer.addListener(new MyExoPlayerStateListener());
 
             if (getResources().getConfiguration().orientation ==
                     Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
-//                mPlayerView.setSystemUiVisibility(
-//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-                mDescTextView.setText(mDescription);
 
-                mUpdateWidget.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent updateWidget = new Intent(UPDATE_WIDGET_BUTTON);
-                        getContext().sendBroadcast(updateWidget);
-                    }
-                });
+                mDescTextView.setText(mDescription);
 
                 mForward.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -266,30 +247,6 @@ public class StepFragment extends Fragment {
         super.onSaveInstanceState(outState);
 
     }
-
-//    private class LoadVideoTask extends AsyncTask<Uri, Void, MediaSource> {
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//            mProgressbar.setVisibility(View.VISIBLE);
-//        }
-//
-//        @Override
-//        protected MediaSource doInBackground(Uri... params) {
-//            String userAgent = Util.getUserAgent(getContext(), "baking_app");
-//            MediaSource mediaSource = new ExtractorMediaSource(params[0],
-//                    new DefaultDataSourceFactory(getContext(), userAgent),
-//                    new DefaultExtractorsFactory(), null, null);
-//            return  mediaSource;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(MediaSource mediaSource) {
-//            super.onPostExecute(mediaSource);
-//            mExoPlayer.prepare(mediaSource);
-//            mExoPlayer.setPlayWhenReady(true);
-//        }
-//    }
 
     private class MyExoPlayerStateListener implements ExoPlayer.EventListener {
         @Override

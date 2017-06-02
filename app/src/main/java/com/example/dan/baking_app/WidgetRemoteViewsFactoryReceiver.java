@@ -1,16 +1,17 @@
 package com.example.dan.baking_app;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.example.dan.baking_app.contentprovider.RecipeContract;
 import com.example.dan.baking_app.objects.Ingredient;
 
 import java.text.DecimalFormat;
@@ -23,7 +24,7 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
     private Context mContext;
     private static ArrayList<Ingredient> sIngredients;
     ArrayList<String> strings = new ArrayList<>();
-    private String mRecipenName;
+    private static String mRecipeName;
 
     public WidgetRemoteViewsFactoryReceiver(){}
 
@@ -33,11 +34,6 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public void onCreate() {
-        Log.d(TAG, "onCreate: Called");
-        initData();
-        if (sIngredients != null) {
-            Log.d(TAG, "onCreate: " + sIngredients.toString());
-        }
     }
 
     @Override
@@ -74,15 +70,14 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public RemoteViews getViewAt(int position) {
+        Log.d(TAG, "mRecipeName: " + mRecipeName);
         if (position == 0) {
             RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.baking_widget_provider);
-            rv.setTextViewText(R.id.widget_recipe_title, "test");
-            Log.d(TAG, "getViewAt: " + mRecipenName);
+            rv.setTextViewText(R.id.widget_recipe_title, mRecipeName);
             return rv;
         } else {
             RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget);
             Ingredient ingredient = sIngredients.get(position);
-            Log.d(TAG, "getViewAt: " + ingredient.getName());
             rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
             rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
 
@@ -121,19 +116,11 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
         return true;
     }
 
-    public void initData() {
-        for (int i = 0; i < 10; i++) {
-            strings.add(Integer.toString(i));
-        }
-    }
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive: Called");
         if (intent.getAction().equals(BakingWidgetProvider.WIDGET_INGREDIENT_DATA_ACTION)) {
             sIngredients = intent.getParcelableArrayListExtra("ingredients");
-            mRecipenName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
-            Log.d(TAG, "mRecipeName: " + mRecipenName);
+            mRecipeName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
         }
     }
 }

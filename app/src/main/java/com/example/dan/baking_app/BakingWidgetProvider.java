@@ -14,44 +14,39 @@ import android.widget.RemoteViews;
 import com.example.dan.baking_app.objects.Ingredient;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class BakingWidgetProvider extends AppWidgetProvider {
 
-    static ArrayList<Ingredient> sIngredients;
     public static final String WIDGET_INGREDIENT_DATA_ACTION
             = "com.example.dan.baking_app.GET_WIDGET_DATA";
 
-    public static final String WIDGET_ROW_ACTION = "com.example.dan.baking_app.WIDGET_ROW_ACTION";
     public static final String WIDGET_ROW_EXTRA = "com.example.dan.baking_app.WIDGET_ROW_EXTRA";
 
     public static final String WIDGET_EXTRA_INTENT = "com.example.dan.baking_app.EXTRA_ITEM";
 
     public String mRecipeName;
-    public static Intent mIntent;
-
-
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId, String name) {
+                                int appWidgetId) {
         Log.d("updateAppWidgetMethod: ", "called");
 
         Intent intent = new Intent(context, WidgetAdapterService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Construct the RemoteViews object
-
-
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
 
         rv.setRemoteAdapter(R.id.widget_listview, intent);
         rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
 
-//        Intent openStep = new Intent(context, RecipeDetailActivity.class);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openStep, 0);
-//        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
+        Intent update = new Intent();
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, update, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
 
 //        appWidgetManager.updateAppWidget(thisWidget, rv);
         // Instruct the widget manager to update the widget
@@ -61,9 +56,8 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.d("onUpdate", "Recipe name = " + mRecipeName);
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId, mRecipeName);
+            updateAppWidget(context, appWidgetManager, appWidgetId);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
@@ -80,16 +74,20 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getParcelableArrayListExtra("ingredients") != null) {
-            mRecipeName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
-
-            Log.d("Recipe name: ", mRecipeName);
-            Intent newIntent = new Intent();
-            newIntent.setAction(WIDGET_INGREDIENT_DATA_ACTION);
-            newIntent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
-            newIntent.putParcelableArrayListExtra("ingredients",
-                    intent.getParcelableArrayListExtra("ingredients"));
-            context.sendBroadcast(newIntent);
+        try {
+            if (intent.getAction().equals(WIDGET_EXTRA_INTENT)) {
+                mRecipeName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
+                Log.d("WidgetProvider", "onReceive: " + WIDGET_EXTRA_INTENT);
+                Log.d("Recipe name: ", mRecipeName);
+                Intent newIntent = new Intent();
+                newIntent.setAction(WIDGET_INGREDIENT_DATA_ACTION);
+                newIntent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
+                newIntent.putParcelableArrayListExtra("ingredients",
+                        intent.getParcelableArrayListExtra("ingredients"));
+                context.sendBroadcast(newIntent);
+          }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
         super.onReceive(context, intent);
     }

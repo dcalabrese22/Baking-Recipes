@@ -2,9 +2,11 @@ package com.example.dan.baking_app;
 
 import android.app.Fragment;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -58,6 +60,7 @@ public class RecipeFragment extends Fragment {
         mRecyclerview.setAdapter(adapter);
 
         broadcast();
+        broadcastWidgetUpdate();
         return rootview;
 
     }
@@ -68,6 +71,20 @@ public class RecipeFragment extends Fragment {
         intent.putParcelableArrayListExtra("ingredients", mIngredients);
         intent.setAction(BakingWidgetProvider.WIDGET_EXTRA_INTENT);
         getActivity().sendBroadcast(intent);
+    }
+
+    public void broadcastWidgetUpdate() {
+        Intent intent = new Intent(getActivity(), BakingWidgetProvider.class);
+        intent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
+        intent.putParcelableArrayListExtra("ingredients", mIngredients);
+        intent.setAction(BakingWidgetProvider.WIDGET_EXTRA_INTENT);
+        getContext().sendBroadcast(intent);
+        Intent update = new Intent(getActivity(), BakingWidgetProvider.class);
+        intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+        int ids[] = AppWidgetManager.getInstance(getContext())
+                .getAppWidgetIds(new ComponentName(getContext(), BakingWidgetProvider.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
+        getContext().sendBroadcast(update);
     }
 
     @Override

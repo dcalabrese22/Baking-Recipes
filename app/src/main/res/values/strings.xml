@@ -2,4 +2,5 @@
     <string name="app_name">Baking App</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="button_update_widget">Add to Widget</string>
 </resources>
