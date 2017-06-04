@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
@@ -30,11 +31,13 @@ public class RecipeFragment extends Fragment {
 
     RecyclerView mRecyclerview;
     PassRecipeDataHandler mHandler;
+    Button mButton;
 
     StepClickHandler mStepClickHandler;
 
     private static final String SAVED_STATE_INGREDIENTS = "ingredients";
     private static final String SAVED_STATE_STEPS = "steps";
+    public static final String SAVED_RECIPE_NAME = "recipe_name";
 
 
     public RecipeFragment() {}
@@ -47,6 +50,18 @@ public class RecipeFragment extends Fragment {
         mRecyclerview = (RecyclerView) rootview.findViewById(R.id.recyclerview_single_recipe);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerview.setLayoutManager(linearLayoutManager);
+        mButton = (Button) rootview.findViewById(R.id.widget_update_button);
+
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent updateWidget = new Intent(getContext(), BakingWidgetProvider.class);
+                updateWidget.putParcelableArrayListExtra(SAVED_STATE_INGREDIENTS, mIngredients);
+                updateWidget.putExtra(SAVED_RECIPE_NAME, mRecipeName);
+                updateWidget.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+                getContext().sendBroadcast(updateWidget);
+            }
+        });
 
         RecipeAdapter adapter = new RecipeAdapter(mStepClickHandler);
 
