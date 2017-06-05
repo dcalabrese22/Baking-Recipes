@@ -12,6 +12,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.example.dan.baking_app.Interfaces.RecipeClickHandler;
+import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.helpers.JsonResponseParser;
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Recipe;
@@ -23,9 +24,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements RecipeClickHandler {
 
-    public static final String INGREDIENT_EXTRA = "ingredient_extra";
-    public static final String STEP_EXTRA = "step_extra";
-    public static final String RECIPE_NAME_EXTRA = "name_extra";
 
     private MasterListAdapter mAdapter;
 
@@ -83,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
 
         Intent intent = new Intent(this, RecipeDetailActivity.class);
         Bundle b = new Bundle();
-        b.putString(RECIPE_NAME_EXTRA, recipe.getName());
-        b.putParcelableArrayList(INGREDIENT_EXTRA, ingredients);
-        b.putParcelableArrayList(STEP_EXTRA, steps);
+        b.putString(Constants.RECIPE_NAME_EXTRA, recipe.getName());
+        b.putParcelableArrayList(Constants.INGREDIENT_EXTRA, ingredients);
+        b.putParcelableArrayList(Constants.STEP_EXTRA, steps);
         intent.putExtras(b);
         startActivity(intent);
     }

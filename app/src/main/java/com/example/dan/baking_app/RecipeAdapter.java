@@ -17,8 +17,6 @@ import java.util.ArrayList;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private ArrayList<Ingredient> mIngredients;
-    private ArrayList<Step> mSteps;
     private ArrayList<Object> mIngredientsAndSteps = new ArrayList<>();
 
     private StepClickHandler mStepClickHandler;

@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
+import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Step;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -58,14 +59,7 @@ public class StepFragment extends Fragment {
     long mVideoPosition;
     boolean mTwoPane;
 
-    private static final String STATE_STEPS = "steps";
-    private static final String STATE_ID = "id";
-    private static final String STATE_URL = "url";
-    private static final String STATE_DESCRIPTION = "description";
-    private static final String STATE_VIDEO_POSITION = "video_position";
 
-    public static final String UPDATE_WIDGET_BUTTON
-            = "com.example.dan.baking_app.ACTION_UPDATE_WIDGET_FROM_BUTTON";
 
     public StepFragment(){}
 
@@ -85,11 +79,11 @@ public class StepFragment extends Fragment {
 
         if (savedInstanceState != null) {
 
-            mVideoUrl = savedInstanceState.getString(STATE_URL);
-            mId = savedInstanceState.getInt(STATE_ID);
-            mDescription = savedInstanceState.getString(STATE_DESCRIPTION);
-            mSteps = savedInstanceState.getParcelableArrayList(STATE_STEPS);
-            mVideoPosition = savedInstanceState.getLong(STATE_VIDEO_POSITION);
+            mVideoUrl = savedInstanceState.getString(Constants.STATE_URL);
+            mId = savedInstanceState.getInt(Constants.STATE_ID);
+            mDescription = savedInstanceState.getString(Constants.STATE_DESCRIPTION);
+            mSteps = savedInstanceState.getParcelableArrayList(Constants.STATE_STEPS);
+            mVideoPosition = savedInstanceState.getLong(Constants.STATE_VIDEO_POSITION);
             initializePlayer(mVideoUrl);
             mExoPlayer.addListener(new MyExoPlayerStateListener());
             mExoPlayer.seekTo(mVideoPosition);
@@ -183,11 +177,11 @@ public class StepFragment extends Fragment {
         super.onAttach(context);
         mHandler = (PassRecipeDataHandler) context;
         mSteps = mHandler.passSteps();
-        mDescription = getArguments().getString(RecipeDetailActivity.DESC_STEP_EXTRA);
+        mDescription = getArguments().getString(Constants.DESC_STEP_EXTRA);
 
-        mVideoUrl = getArguments().getString(RecipeDetailActivity.URL_STEP_EXTRA);
-        mId = getArguments().getInt(RecipeDetailActivity.ID_STEP_EXTRA);
-        mTwoPane = getArguments().getBoolean(RecipeDetailActivity.TWO_PANE_EXTRA);
+        mVideoUrl = getArguments().getString(Constants.URL_STEP_EXTRA);
+        mId = getArguments().getInt(Constants.ID_STEP_EXTRA);
+        mTwoPane = getArguments().getBoolean(Constants.TWO_PANE_EXTRA);
     }
 
     public void initializePlayer(String url) {
@@ -239,11 +233,11 @@ public class StepFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         long position = mExoPlayer.getCurrentPosition();
-        outState.putParcelableArrayList(STATE_STEPS, mSteps);
-        outState.putInt(STATE_ID, mId);
-        outState.putString(STATE_DESCRIPTION, mDescription);
-        outState.putString(STATE_URL, mVideoUrl);
-        outState.putLong(STATE_VIDEO_POSITION, position);
+        outState.putParcelableArrayList(Constants.STATE_STEPS, mSteps);
+        outState.putInt(Constants.STATE_ID, mId);
+        outState.putString(Constants.STATE_DESCRIPTION, mDescription);
+        outState.putString(Constants.STATE_URL, mVideoUrl);
+        outState.putLong(Constants.STATE_VIDEO_POSITION, position);
         super.onSaveInstanceState(outState);
 
     }

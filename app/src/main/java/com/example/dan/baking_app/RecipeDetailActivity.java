@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
+import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Step;
 
@@ -19,13 +20,6 @@ import java.util.ArrayList;
 
 public class RecipeDetailActivity extends AppCompatActivity
         implements PassRecipeDataHandler, StepClickHandler{
-
-    public static final String DESC_STEP_EXTRA = "desc_extra";
-    public static final String URL_STEP_EXTRA = "url_extra";
-    public static final String ID_STEP_EXTRA = "id_extra";
-    public static final String TWO_PANE_EXTRA = "two_pane_extra";
-    public static final String STEP_KEY = "step_fragment";
-    public static final String RECIPE_KEY = "recipe_fragment";
 
     StepFragment mStepFragment;
     RecipeFragment mRecipeFragment;
@@ -59,30 +53,30 @@ public class RecipeDetailActivity extends AppCompatActivity
         if (findViewById(R.id.two_pane) != null) {
             mTwoPane = true;
             if (savedInstanceState != null) {
-                if (savedInstanceState.containsKey(STEP_KEY)) {
+                if (savedInstanceState.containsKey(Constants.STEP_KEY)) {
                     mStepFragment = (StepFragment) getFragmentManager()
-                            .getFragment(savedInstanceState, STEP_KEY);
+                            .getFragment(savedInstanceState, Constants.STEP_KEY);
                 } else {
                     mRecipeFragment = (RecipeFragment) getFragmentManager()
-                            .getFragment(savedInstanceState, RECIPE_KEY);
+                            .getFragment(savedInstanceState, Constants.RECIPE_KEY);
                 }
             } else {
 
                 mRecipeFragment = new RecipeFragment();
 
                 fragmentManager.beginTransaction()
-                        .replace(R.id.recipe_list_container, mRecipeFragment, RECIPE_KEY)
+                        .replace(R.id.recipe_list_container, mRecipeFragment, Constants.RECIPE_KEY)
                         .commit();
             }
             } else {
             mTwoPane = false;
             if (savedInstanceState != null) {
-                if (savedInstanceState.containsKey(STEP_KEY)) {
+                if (savedInstanceState.containsKey(Constants.STEP_KEY)) {
                     mStepFragment = (StepFragment) getFragmentManager()
-                            .getFragment(savedInstanceState, STEP_KEY);
-                } else if (savedInstanceState.containsKey(RECIPE_KEY)) {
+                            .getFragment(savedInstanceState, Constants.STEP_KEY);
+                } else if (savedInstanceState.containsKey(Constants.RECIPE_KEY)) {
                     mRecipeFragment = (RecipeFragment) getFragmentManager()
-                            .getFragment(savedInstanceState, RECIPE_KEY);
+                            .getFragment(savedInstanceState, Constants.RECIPE_KEY);
                 }
             } else {
 
@@ -90,7 +84,7 @@ public class RecipeDetailActivity extends AppCompatActivity
 
 
                 fragmentManager.beginTransaction()
-                        .replace(R.id.activity_recipe_detail, mRecipeFragment, RECIPE_KEY)
+                        .replace(R.id.activity_recipe_detail, mRecipeFragment, Constants.RECIPE_KEY)
                         .commit();
             }
         }
@@ -100,25 +94,25 @@ public class RecipeDetailActivity extends AppCompatActivity
         if (mTwoPane) {
             mToolbar.setTitle(getResources().getString(R.string.app_name));
         } else {
-            mToolbar.setTitle(getIntent().getExtras().getString(MainActivity.RECIPE_NAME_EXTRA));
+            mToolbar.setTitle(getIntent().getExtras().getString(Constants.RECIPE_NAME_EXTRA));
         }
     }
 
     @Override
     public ArrayList<Ingredient> passIngredients() {
-        mIngredients = getIntent().getExtras().getParcelableArrayList(MainActivity.INGREDIENT_EXTRA);
+        mIngredients = getIntent().getExtras().getParcelableArrayList(Constants.INGREDIENT_EXTRA);
         return mIngredients;
     }
 
     @Override
     public ArrayList<Step> passSteps() {
-        mSteps = getIntent().getExtras().getParcelableArrayList(MainActivity.STEP_EXTRA);
+        mSteps = getIntent().getExtras().getParcelableArrayList(Constants.STEP_EXTRA);
         return mSteps;
     }
 
     @Override
     public String passRecipeName() {
-        return getIntent().getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
+        return getIntent().getStringExtra(Constants.RECIPE_NAME_EXTRA);
     }
 
     @Override
@@ -128,18 +122,18 @@ public class RecipeDetailActivity extends AppCompatActivity
         String url = step.getVideoUrl();
         int id = step.getId();
         Bundle bundle = new Bundle();
-        bundle.putString(DESC_STEP_EXTRA, desc);
-        bundle.putString(URL_STEP_EXTRA, url);
-        bundle.putInt(ID_STEP_EXTRA, id);
-        bundle.putBoolean(TWO_PANE_EXTRA, mTwoPane);
+        bundle.putString(Constants.DESC_STEP_EXTRA, desc);
+        bundle.putString(Constants.URL_STEP_EXTRA, url);
+        bundle.putInt(Constants.ID_STEP_EXTRA, id);
+        bundle.putBoolean(Constants.TWO_PANE_EXTRA, mTwoPane);
         mStepFragment = new StepFragment();
         mStepFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (mTwoPane) {
-            fragmentTransaction.add(R.id.step_container, mStepFragment, STEP_KEY);
+            fragmentTransaction.add(R.id.step_container, mStepFragment, Constants.STEP_KEY);
             fragmentTransaction.commit();
         } else {
-            fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment, STEP_KEY);
+            fragmentTransaction.replace(R.id.activity_recipe_detail, mStepFragment, Constants.STEP_KEY);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         }

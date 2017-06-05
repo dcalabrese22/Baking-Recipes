@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Ingredient;
 
 import java.util.ArrayList;
@@ -20,13 +21,6 @@ import java.util.Arrays;
  * Implementation of App Widget functionality.
  */
 public class BakingWidgetProvider extends AppWidgetProvider {
-
-    public static final String WIDGET_INGREDIENT_DATA_ACTION
-            = "com.example.dan.baking_app.GET_WIDGET_DATA";
-
-    public static final String WIDGET_ROW_EXTRA = "com.example.dan.baking_app.WIDGET_ROW_EXTRA";
-
-    public static final String WIDGET_EXTRA_INTENT = "com.example.dan.baking_app.EXTRA_ITEM";
 
     public String mRecipeName;
 
@@ -41,12 +35,14 @@ public class BakingWidgetProvider extends AppWidgetProvider {
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
 
         rv.setRemoteAdapter(R.id.widget_listview, intent);
-        rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
+        //rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
 
-        Intent update = new Intent();
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, update, PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
+//        Intent update = new Intent();
+//        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, update, PendingIntent.FLAG_UPDATE_CURRENT);
+//        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
+
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_listview);
 
 //        appWidgetManager.updateAppWidget(thisWidget, rv);
         // Instruct the widget manager to update the widget
@@ -74,23 +70,36 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        try {
-            if (intent.getAction().equals(WIDGET_EXTRA_INTENT)) {
-                mRecipeName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
-                Log.d("WidgetProvider", "onReceive: " + WIDGET_EXTRA_INTENT);
-                Log.d("Recipe name: ", mRecipeName);
-                Intent newIntent = new Intent();
-                newIntent.setAction(WIDGET_INGREDIENT_DATA_ACTION);
-                newIntent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
-                newIntent.putParcelableArrayListExtra("ingredients",
-                        intent.getParcelableArrayListExtra("ingredients"));
-                context.sendBroadcast(newIntent);
-          }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BakingWidgetProvider.class.getName());
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_listview);
+        if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+            int appWidgetId = intent.getIntExtra(
+                    AppWidgetManager.EXTRA_APPWIDGET_ID,
+                    AppWidgetManager.INVALID_APPWIDGET_ID);
+
+            updateAppWidget(context, appWidgetManager, appWidgetId);
+//        try {
+//            if (intent.getAction().equals(Constants.WIDGET_EXTRA_INTENT)) {
+//                mRecipeName = intent.getStringExtra(Constants.RECIPE_NAME_EXTRA);
+//                Log.d("WidgetProvider", "onReceive: " + Constants.WIDGET_EXTRA_INTENT);
+//                Log.d("Recipe name: ", mRecipeName);
+//                Intent newIntent = new Intent();
+//                newIntent.setAction(Constants.WIDGET_INGREDIENT_DATA_ACTION);
+//                newIntent.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
+//                newIntent.putParcelableArrayListExtra(Constants.INGREDIENT_EXTRA,
+//                        intent.getParcelableArrayListExtra(Constants.INGREDIENT_EXTRA));
+//                context.sendBroadcast(newIntent);
+//          }
+//        } catch (NullPointerException e) {
+//            e.printStackTrace();
+//        }
+
+            super.onReceive(context, intent);
         }
-        super.onReceive(context, intent);
     }
+
 
 }
 

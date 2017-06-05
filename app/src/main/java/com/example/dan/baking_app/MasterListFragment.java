@@ -31,9 +31,6 @@ public class MasterListFragment extends Fragment {
 
     private MasterListAdapter mAdapter;
 
-    public static final String INGREDIENT_EXTRA = "ingredient_extra";
-    public static final String STEP_EXTRA = "step_extra";
-
     public MasterListFragment() {}
 
     @Nullable

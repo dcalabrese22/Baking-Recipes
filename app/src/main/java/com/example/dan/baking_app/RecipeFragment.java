@@ -18,6 +18,7 @@ import android.widget.Button;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
+import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Step;
 
@@ -35,9 +36,7 @@ public class RecipeFragment extends Fragment {
 
     StepClickHandler mStepClickHandler;
 
-    private static final String SAVED_STATE_INGREDIENTS = "ingredients";
-    private static final String SAVED_STATE_STEPS = "steps";
-    public static final String SAVED_RECIPE_NAME = "recipe_name";
+
 
 
     public RecipeFragment() {}
@@ -55,44 +54,46 @@ public class RecipeFragment extends Fragment {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent updateWidget = new Intent(getContext(), BakingWidgetProvider.class);
-                updateWidget.putParcelableArrayListExtra(SAVED_STATE_INGREDIENTS, mIngredients);
-                updateWidget.putExtra(SAVED_RECIPE_NAME, mRecipeName);
-                updateWidget.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                getContext().sendBroadcast(updateWidget);
+                sendToService();
             }
         });
 
         RecipeAdapter adapter = new RecipeAdapter(mStepClickHandler);
 
         if (savedInstanceState != null) {
-            mSteps = savedInstanceState.getParcelableArrayList(SAVED_STATE_STEPS);
-            mIngredients = savedInstanceState.getParcelableArrayList(SAVED_STATE_INGREDIENTS);
+            mSteps = savedInstanceState.getParcelableArrayList(Constants.SAVED_STATE_STEPS);
+            mIngredients = savedInstanceState.getParcelableArrayList(Constants.SAVED_STATE_INGREDIENTS);
         }
 
         adapter.setData(mIngredients, mSteps);
 
         mRecyclerview.setAdapter(adapter);
 
-        broadcast();
-        broadcastWidgetUpdate();
+
         return rootview;
 
     }
 
     public void broadcast() {
         Intent intent = new Intent();
-        intent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
-        intent.putParcelableArrayListExtra("ingredients", mIngredients);
-        intent.setAction(BakingWidgetProvider.WIDGET_EXTRA_INTENT);
+        intent.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
+        intent.putParcelableArrayListExtra(Constants.INGREDIENT_EXTRA, mIngredients);
+        intent.setAction(Constants.WIDGET_EXTRA_INTENT);
         getActivity().sendBroadcast(intent);
     }
 
+    public void sendToService() {
+        Intent sendToService = new Intent(getActivity(), WidgetAdapterService.class);
+        sendToService.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
+        sendToService.putParcelableArrayListExtra(Constants.INGREDIENT_EXTRA, mIngredients);
+        getActivity().startService(sendToService);
+    }
+
     public void broadcastWidgetUpdate() {
-        Intent intent = new Intent(getActivity(), BakingWidgetProvider.class);
-        intent.putExtra(MainActivity.RECIPE_NAME_EXTRA, mRecipeName);
+        Intent intent = new Intent(getActivity(), WidgetAdapterService.class);
+        intent.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
         intent.putParcelableArrayListExtra("ingredients", mIngredients);
-        intent.setAction(BakingWidgetProvider.WIDGET_EXTRA_INTENT);
+        intent.setAction(Constants.WIDGET_EXTRA_INTENT);
         getContext().sendBroadcast(intent);
         Intent update = new Intent(getActivity(), BakingWidgetProvider.class);
         intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
@@ -105,8 +106,8 @@ public class RecipeFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(SAVED_STATE_INGREDIENTS, mIngredients);
-        outState.putParcelableArrayList(SAVED_STATE_STEPS, mSteps);
+        outState.putParcelableArrayList(Constants.SAVED_STATE_INGREDIENTS, mIngredients);
+        outState.putParcelableArrayList(Constants.SAVED_STATE_STEPS, mSteps);
     }
 
     @Override

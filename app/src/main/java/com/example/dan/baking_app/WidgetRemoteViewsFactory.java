@@ -12,24 +12,27 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.example.dan.baking_app.contentprovider.RecipeContract;
+import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Ingredient;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
-        implements RemoteViewsService.RemoteViewsFactory{
+public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     private final String TAG = "Factory Receiver";
     private Context mContext;
-    private static ArrayList<Ingredient> sIngredients;
+    private ArrayList<Ingredient> mIngredients;
     ArrayList<String> strings = new ArrayList<>();
-    private static String mRecipeName;
+    private String mRecipeName;
 
-    public WidgetRemoteViewsFactoryReceiver(){}
+    public WidgetRemoteViewsFactory(){}
 
-    public WidgetRemoteViewsFactoryReceiver(Context context, Intent intent) {
+    public WidgetRemoteViewsFactory(Context context, Intent intent, String recipeName,
+                                    ArrayList<Ingredient> ingredients) {
         mContext = context;
+        mRecipeName = recipeName;
+        mIngredients = ingredients;
     }
 
     @Override
@@ -38,8 +41,8 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
 
     @Override
     public int getCount() {
-        if (sIngredients != null) {
-            return sIngredients.size();
+        if (mIngredients != null) {
+            return mIngredients.size();
         } else {
             return 0;
         }
@@ -77,12 +80,12 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
             return rv;
         } else {
             RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget);
-            Ingredient ingredient = sIngredients.get(position);
+            Ingredient ingredient = mIngredients.get(position);
             rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
             rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
 
             Bundle extras = new Bundle();
-            extras.putInt(BakingWidgetProvider.WIDGET_ROW_EXTRA, position);
+            extras.putInt(Constants.WIDGET_ROW_EXTRA, position);
             Intent fillInIntent = new Intent();
             fillInIntent.putExtras(extras);
             fillInIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
@@ -101,8 +104,8 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy: called");
-        if (sIngredients != null) {
-            sIngredients.clear();
+        if (mIngredients != null) {
+            mIngredients.clear();
         }
     }
 
@@ -114,13 +117,5 @@ public class WidgetRemoteViewsFactoryReceiver extends BroadcastReceiver
     @Override
     public boolean hasStableIds() {
         return true;
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(BakingWidgetProvider.WIDGET_INGREDIENT_DATA_ACTION)) {
-            sIngredients = intent.getParcelableArrayListExtra("ingredients");
-            mRecipeName = intent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
-        }
     }
 }
