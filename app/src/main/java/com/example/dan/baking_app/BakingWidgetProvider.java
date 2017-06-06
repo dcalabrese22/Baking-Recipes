@@ -30,6 +30,7 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
         Intent intent = new Intent(context, WidgetAdapterService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setAction(Constants.UPDATE_MY_WIDGET);
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Construct the RemoteViews object
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
@@ -74,27 +75,12 @@ public class BakingWidgetProvider extends AppWidgetProvider {
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BakingWidgetProvider.class.getName());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_listview);
-        if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+        if (intent.getAction().equals(Constants.UPDATE_MY_WIDGET)) {
             int appWidgetId = intent.getIntExtra(
                     AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID);
 
             updateAppWidget(context, appWidgetManager, appWidgetId);
-//        try {
-//            if (intent.getAction().equals(Constants.WIDGET_EXTRA_INTENT)) {
-//                mRecipeName = intent.getStringExtra(Constants.RECIPE_NAME_EXTRA);
-//                Log.d("WidgetProvider", "onReceive: " + Constants.WIDGET_EXTRA_INTENT);
-//                Log.d("Recipe name: ", mRecipeName);
-//                Intent newIntent = new Intent();
-//                newIntent.setAction(Constants.WIDGET_INGREDIENT_DATA_ACTION);
-//                newIntent.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
-//                newIntent.putParcelableArrayListExtra(Constants.INGREDIENT_EXTRA,
-//                        intent.getParcelableArrayListExtra(Constants.INGREDIENT_EXTRA));
-//                context.sendBroadcast(newIntent);
-//          }
-//        } catch (NullPointerException e) {
-//            e.printStackTrace();
-//        }
 
             super.onReceive(context, intent);
         }

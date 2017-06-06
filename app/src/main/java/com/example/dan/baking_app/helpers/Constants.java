@@ -32,6 +32,8 @@ public class Constants {
     public static final String WIDGET_INGREDIENT_DATA_ACTION
             = "com.example.dan.baking_app.GET_WIDGET_DATA";
 
+    public static final String UPDATE_MY_WIDGET = "com.example.dan.baking_app.UPDATE_MY_WIDGET";
+
     public static final String WIDGET_ROW_EXTRA = "com.example.dan.baking_app.WIDGET_ROW_EXTRA";
 
     public static final String WIDGET_EXTRA_INTENT = "com.example.dan.baking_app.EXTRA_ITEM";

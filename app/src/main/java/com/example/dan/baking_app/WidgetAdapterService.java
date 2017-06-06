@@ -28,4 +28,11 @@ public class WidgetAdapterService extends RemoteViewsService {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    @Override
+    public void onDestroy() {
+        mRecipeName = null;
+        mIngredients.clear();
+        stopSelf();
+        super.onDestroy();
+    }
 }

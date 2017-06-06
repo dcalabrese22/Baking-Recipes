@@ -54,6 +54,8 @@ public class RecipeFragment extends Fragment {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent stop = new Intent(getContext(), WidgetAdapterService.class);
+                getActivity().stopService(stop);
                 sendToService();
             }
         });
@@ -86,6 +88,11 @@ public class RecipeFragment extends Fragment {
         Intent sendToService = new Intent(getActivity(), WidgetAdapterService.class);
         sendToService.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
         sendToService.putParcelableArrayListExtra(Constants.INGREDIENT_EXTRA, mIngredients);
+        sendToService.setAction(Constants.UPDATE_MY_WIDGET);
+        AppWidgetManager manager = AppWidgetManager.getInstance(getContext());
+        int[] ids = manager.getAppWidgetIds(new ComponentName(getContext(), BakingWidgetProvider.class));
+        Log.d("ids[0]", Integer.toString(ids[0]));
+        BakingWidgetProvider.updateAppWidget(getContext(), manager, ids[0]);
         getActivity().startService(sendToService);
     }
 

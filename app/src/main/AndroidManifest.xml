@@ -30,9 +30,10 @@
         <receiver android:name=".BakingWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.example.dan.baking_app.WIDGET_ROW_ACTION" />
-                <action android:name="com.example.dan.baking_app.EXTRA_ITEM" />
-                <action android:name="com.example.dan.baking_app.ACTION_UPDATE_WIDGET_FROM_BUTTON" />
+                <action android:name="com.example.dan.baking_app.UPDATE_MY_WIDGET" />
+                <!--<action android:name="com.example.dan.baking_app.WIDGET_ROW_ACTION" />-->
+                <!--<action android:name="com.example.dan.baking_app.EXTRA_ITEM" />-->
+                <!--<action android:name="com.example.dan.baking_app.ACTION_UPDATE_WIDGET_FROM_BUTTON" />-->
             </intent-filter>
 
             <meta-data

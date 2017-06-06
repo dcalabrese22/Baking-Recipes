@@ -23,7 +23,6 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
     private final String TAG = "Factory Receiver";
     private Context mContext;
     private ArrayList<Ingredient> mIngredients;
-    ArrayList<String> strings = new ArrayList<>();
     private String mRecipeName;
 
     public WidgetRemoteViewsFactory(){}
@@ -51,7 +50,6 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
     @Override
     public void onDataSetChanged() {
         Log.d(TAG, "onDataSetChanged: Called");
-
     }
 
     @Override
