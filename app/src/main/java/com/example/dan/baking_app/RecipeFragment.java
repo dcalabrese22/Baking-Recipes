@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
@@ -18,6 +20,7 @@ import android.widget.Button;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
+import com.example.dan.baking_app.contentprovider.RecipeContract;
 import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Step;
@@ -36,9 +39,6 @@ public class RecipeFragment extends Fragment {
 
     StepClickHandler mStepClickHandler;
 
-
-
-
     public RecipeFragment() {}
 
     @Nullable
@@ -54,9 +54,7 @@ public class RecipeFragment extends Fragment {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent stop = new Intent(getContext(), WidgetAdapterService.class);
-                getActivity().stopService(stop);
-                sendToService();
+                broadcast();
             }
         });
 
@@ -71,43 +69,19 @@ public class RecipeFragment extends Fragment {
 
         mRecyclerview.setAdapter(adapter);
 
-
         return rootview;
 
     }
 
     public void broadcast() {
-        Intent intent = new Intent();
-        intent.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
-        intent.putParcelableArrayListExtra(Constants.INGREDIENT_EXTRA, mIngredients);
-        intent.setAction(Constants.WIDGET_EXTRA_INTENT);
+        Intent intent = new Intent(getContext(), BakingWidgetProvider.class);
+        SharedPreferences widgetSetting = getActivity()
+                .getSharedPreferences(Constants.WIDGET_PREFERENCE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = widgetSetting.edit();
+        editor.putString(Constants.PREFERENCE_INGREDIENT_NAME, mRecipeName);
+        editor.commit();
+        intent.setAction(Constants.UPDATE_MY_WIDGET);
         getActivity().sendBroadcast(intent);
-    }
-
-    public void sendToService() {
-        Intent sendToService = new Intent(getActivity(), WidgetAdapterService.class);
-        sendToService.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
-        sendToService.putParcelableArrayListExtra(Constants.INGREDIENT_EXTRA, mIngredients);
-        sendToService.setAction(Constants.UPDATE_MY_WIDGET);
-        AppWidgetManager manager = AppWidgetManager.getInstance(getContext());
-        int[] ids = manager.getAppWidgetIds(new ComponentName(getContext(), BakingWidgetProvider.class));
-        Log.d("ids[0]", Integer.toString(ids[0]));
-        BakingWidgetProvider.updateAppWidget(getContext(), manager, ids[0]);
-        getActivity().startService(sendToService);
-    }
-
-    public void broadcastWidgetUpdate() {
-        Intent intent = new Intent(getActivity(), WidgetAdapterService.class);
-        intent.putExtra(Constants.RECIPE_NAME_EXTRA, mRecipeName);
-        intent.putParcelableArrayListExtra("ingredients", mIngredients);
-        intent.setAction(Constants.WIDGET_EXTRA_INTENT);
-        getContext().sendBroadcast(intent);
-        Intent update = new Intent(getActivity(), BakingWidgetProvider.class);
-        intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
-        int ids[] = AppWidgetManager.getInstance(getContext())
-                .getAppWidgetIds(new ComponentName(getContext(), BakingWidgetProvider.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
-        getContext().sendBroadcast(update);
     }
 
     @Override

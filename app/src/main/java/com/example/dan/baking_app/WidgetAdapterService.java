@@ -3,6 +3,7 @@ package com.example.dan.baking_app;
 import android.app.Service;
 import android.content.Intent;
 import android.support.annotation.IntDef;
+import android.util.Log;
 import android.widget.RemoteViewsService;
 
 import com.example.dan.baking_app.helpers.Constants;
@@ -12,27 +13,28 @@ import java.util.ArrayList;
 
 public class WidgetAdapterService extends RemoteViewsService {
 
-    String mRecipeName;
-    ArrayList<Ingredient> mIngredients;
-
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new WidgetRemoteViewsFactory(getApplicationContext(), intent,
-                mRecipeName, mIngredients);
+        Log.d("RemoteViewsFacotry", "called");
+        return new WidgetRemoteViewsFactory(this.getApplicationContext(), intent);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mRecipeName = intent.getStringExtra(Constants.RECIPE_NAME_EXTRA);
-        mIngredients = intent.getParcelableArrayListExtra(Constants.INGREDIENT_EXTRA);
-        return super.onStartCommand(intent, flags, startId);
-    }
+//    @Override
+//    public int onStartCommand(Intent intent, int flags, int startId) {
+//        mRecipeName = intent.getStringExtra(Constants.RECIPE_NAME_EXTRA);
+//        mIngredients = intent.getParcelableArrayListExtra(Constants.INGREDIENT_EXTRA);
+//        Log.d("Widget service", "mRecipeName = " + mRecipeName);
+//        return super.onStartCommand(intent, flags, startId);
+//    }
+//
+//    @Override
+//    public void onDestroy() {
+//        if (mRecipeName != null) {
+//            mRecipeName = null;
+//        }
+//        if (mIngredients != null) {
+//            mIngredients.clear();
+//        }
+//    }
 
-    @Override
-    public void onDestroy() {
-        mRecipeName = null;
-        mIngredients.clear();
-        stopSelf();
-        super.onDestroy();
-    }
 }

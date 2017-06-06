@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,22 +21,27 @@ import java.util.ArrayList;
 
 public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
-    private final String TAG = "Factory Receiver";
+    private final String TAG = "Remote views factory";
     private Context mContext;
     private ArrayList<Ingredient> mIngredients;
     private String mRecipeName;
+    private int mAppWidgetId;
 
-    public WidgetRemoteViewsFactory(){}
-
-    public WidgetRemoteViewsFactory(Context context, Intent intent, String recipeName,
-                                    ArrayList<Ingredient> ingredients) {
+    public WidgetRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
-        mRecipeName = recipeName;
-        mIngredients = ingredients;
+        mIngredients = new ArrayList<>();
+        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
     @Override
     public void onCreate() {
+        SharedPreferences preferences = mContext.
+                getSharedPreferences(Constants.WIDGET_PREFERENCE, Context.MODE_PRIVATE);
+        mRecipeName = preferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
+        if (mRecipeName != null) {
+            getData(mRecipeName);
+        }
     }
 
     @Override
@@ -49,12 +55,19 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     @Override
     public void onDataSetChanged() {
-        Log.d(TAG, "onDataSetChanged: Called");
+        if (mIngredients != null) {
+            mIngredients.clear();
+        }
+        SharedPreferences preferences = mContext.
+                getSharedPreferences(Constants.WIDGET_PREFERENCE, Context.MODE_PRIVATE);
+        mRecipeName = preferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
+        if (mRecipeName != null) {
+            getData(mRecipeName);
+        }
     }
 
     @Override
     public int getViewTypeCount() {
-        Log.d(TAG, "getViewTypeCount: Called");
         return 2;
     }
 
@@ -71,7 +84,6 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.d(TAG, "mRecipeName: " + mRecipeName);
         if (position == 0) {
             RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.baking_widget_provider);
             rv.setTextViewText(R.id.widget_recipe_title, mRecipeName);
@@ -82,26 +94,48 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
             rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
             rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
 
-            Bundle extras = new Bundle();
-            extras.putInt(Constants.WIDGET_ROW_EXTRA, position);
-            Intent fillInIntent = new Intent();
-            fillInIntent.putExtras(extras);
-            fillInIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-
-            rv.setOnClickFillInIntent(R.id.recipe_ingredient, fillInIntent);
             return rv;
         }
     }
 
+    public void getData(String recipeName) {
+        String selection = RecipeContract.RecipeEntry.COLUMN_NAME + "=?";
+        Cursor cursor = mContext.getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
+                null, selection, new String[] {recipeName}, null);
+        int idIndex = cursor.getColumnIndex(RecipeContract.RecipeEntry._ID);
+        if (cursor.moveToFirst()) {
+            selection = RecipeContract.IngredientEntry.FOREIGN_KEY + "=?";
+            String sortOrder = RecipeContract.IngredientEntry._ID;
+            cursor = mContext.getContentResolver().query(RecipeContract.IngredientEntry.CONTENT_URI,
+                    null, selection, new String[] {Integer.toString(cursor.getInt(idIndex))}, sortOrder);
+            makeIngredientsList(cursor);
+        }
+
+        cursor.close();
+    }
+
+    public void makeIngredientsList(Cursor cursor) {
+        int ingNameIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_NAME);
+        int ingQuantityIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_QUANTITY);
+        int ingMeasureIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_MEASURE);
+        while (cursor.moveToNext()) {
+            String ingName = cursor.getString(ingNameIndex);
+            String ingMeasure = cursor.getString(ingMeasureIndex);
+            Double ingQuantity = cursor.getDouble(ingQuantityIndex);
+            Ingredient ingredient = new Ingredient(ingQuantity, ingMeasure, ingName);
+            mIngredients.add(ingredient);
+        }
+
+    }
+
     @Override
     public long getItemId(int position) {
-        Log.d(TAG, "getItemId: Called");
         return position;
     }
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy: called");
+        mRecipeName = null;
         if (mIngredients != null) {
             mIngredients.clear();
         }

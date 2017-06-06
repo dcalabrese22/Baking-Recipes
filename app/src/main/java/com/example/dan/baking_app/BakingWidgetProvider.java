@@ -22,30 +22,26 @@ import java.util.Arrays;
  */
 public class BakingWidgetProvider extends AppWidgetProvider {
 
-    public String mRecipeName;
+    String mRecipeName;
+    ArrayList<Ingredient> mIngredients;
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                         int appWidgetId) {
         Log.d("updateAppWidgetMethod: ", "called");
-
         Intent intent = new Intent(context, WidgetAdapterService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        intent.setAction(Constants.UPDATE_MY_WIDGET);
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Construct the RemoteViews object
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
 
         rv.setRemoteAdapter(R.id.widget_listview, intent);
-        //rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
+        rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
 
 //        Intent update = new Intent();
 //        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 //        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, update, PendingIntent.FLAG_UPDATE_CURRENT);
 //        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
 
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_listview);
-
-//        appWidgetManager.updateAppWidget(thisWidget, rv);
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, rv);
 
@@ -53,6 +49,7 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
@@ -71,19 +68,21 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BakingWidgetProvider.class.getName());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_listview);
-        if (intent.getAction().equals(Constants.UPDATE_MY_WIDGET)) {
+        if (intent.getAction().equals(Constants.UPDATE_MY_WIDGET) ||
+                intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
             int appWidgetId = intent.getIntExtra(
                     AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID);
 
             updateAppWidget(context, appWidgetManager, appWidgetId);
-
-            super.onReceive(context, intent);
         }
+        super.onReceive(context, intent);
+
     }
 
 
