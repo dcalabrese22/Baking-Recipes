@@ -2,6 +2,7 @@ package com.example.dan.baking_app;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,11 +13,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
+import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Step;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -56,11 +59,7 @@ public class StepFragment extends Fragment {
     long mVideoPosition;
     boolean mTwoPane;
 
-    private static final String STATE_STEPS = "steps";
-    private static final String STATE_ID = "id";
-    private static final String STATE_URL = "url";
-    private static final String STATE_DESCRIPTION = "description";
-    private static final String STATE_VIDEO_POSITION = "video_position";
+
 
     public StepFragment(){}
 
@@ -79,15 +78,12 @@ public class StepFragment extends Fragment {
 
 
         if (savedInstanceState != null) {
-//            mPlayerView.setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            mVideoUrl = savedInstanceState.getString(STATE_URL);
-            mId = savedInstanceState.getInt(STATE_ID);
-            mDescription = savedInstanceState.getString(STATE_DESCRIPTION);
-            mSteps = savedInstanceState.getParcelableArrayList(STATE_STEPS);
-            mVideoPosition = savedInstanceState.getLong(STATE_VIDEO_POSITION);
+
+            mVideoUrl = savedInstanceState.getString(Constants.STATE_URL);
+            mId = savedInstanceState.getInt(Constants.STATE_ID);
+            mDescription = savedInstanceState.getString(Constants.STATE_DESCRIPTION);
+            mSteps = savedInstanceState.getParcelableArrayList(Constants.STATE_STEPS);
+            mVideoPosition = savedInstanceState.getLong(Constants.STATE_VIDEO_POSITION);
             initializePlayer(mVideoUrl);
             mExoPlayer.addListener(new MyExoPlayerStateListener());
             mExoPlayer.seekTo(mVideoPosition);
@@ -132,18 +128,12 @@ public class StepFragment extends Fragment {
             }
         } else {
             initializePlayer(mVideoUrl);
-//            mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            mExoPlayer.addListener(new MyExoPlayerStateListener());
 
+            mExoPlayer.addListener(new MyExoPlayerStateListener());
 
             if (getResources().getConfiguration().orientation ==
                     Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
-//                mPlayerView.setSystemUiVisibility(
-//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
                 mDescTextView.setText(mDescription);
 
                 mForward.setOnClickListener(new View.OnClickListener() {
@@ -187,11 +177,11 @@ public class StepFragment extends Fragment {
         super.onAttach(context);
         mHandler = (PassRecipeDataHandler) context;
         mSteps = mHandler.passSteps();
-        mDescription = getArguments().getString(RecipeDetailActivity.DESC_STEP_EXTRA);
+        mDescription = getArguments().getString(Constants.DESC_STEP_EXTRA);
 
-        mVideoUrl = getArguments().getString(RecipeDetailActivity.URL_STEP_EXTRA);
-        mId = getArguments().getInt(RecipeDetailActivity.ID_STEP_EXTRA);
-        mTwoPane = getArguments().getBoolean(RecipeDetailActivity.TWO_PANE_EXTRA);
+        mVideoUrl = getArguments().getString(Constants.URL_STEP_EXTRA);
+        mId = getArguments().getInt(Constants.ID_STEP_EXTRA);
+        mTwoPane = getArguments().getBoolean(Constants.TWO_PANE_EXTRA);
     }
 
     public void initializePlayer(String url) {
@@ -218,11 +208,14 @@ public class StepFragment extends Fragment {
 
     public void getMovie() {
         mVideoUrl = mSteps.get(mId).getVideoUrl();
-        if (mVideoUrl.equals("")) {
-            return;
-        } else {
+        if (!mVideoUrl.equals("")) {
+            mProgressbar.setVisibility(View.VISIBLE);
+            mPlayerView.setVisibility(View.VISIBLE);
             Uri mediaUri = Uri.parse(mVideoUrl);
-            new LoadVideoTask().execute(mediaUri);
+            mExoPlayer.prepare(buildMediaSource(mediaUri), true, true);
+        } else {
+            mProgressbar.setVisibility(View.GONE);
+            mPlayerView.setVisibility(View.GONE);
         }
 
     }
@@ -243,37 +236,13 @@ public class StepFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         long position = mExoPlayer.getCurrentPosition();
-        outState.putParcelableArrayList(STATE_STEPS, mSteps);
-        outState.putInt(STATE_ID, mId);
-        outState.putString(STATE_DESCRIPTION, mDescription);
-        outState.putString(STATE_URL, mVideoUrl);
-        outState.putLong(STATE_VIDEO_POSITION, position);
+        outState.putParcelableArrayList(Constants.STATE_STEPS, mSteps);
+        outState.putInt(Constants.STATE_ID, mId);
+        outState.putString(Constants.STATE_DESCRIPTION, mDescription);
+        outState.putString(Constants.STATE_URL, mVideoUrl);
+        outState.putLong(Constants.STATE_VIDEO_POSITION, position);
         super.onSaveInstanceState(outState);
 
-    }
-
-    private class LoadVideoTask extends AsyncTask<Uri, Void, MediaSource> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressbar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected MediaSource doInBackground(Uri... params) {
-            String userAgent = Util.getUserAgent(getContext(), "baking_app");
-            MediaSource mediaSource = new ExtractorMediaSource(params[0],
-                    new DefaultDataSourceFactory(getContext(), userAgent),
-                    new DefaultExtractorsFactory(), null, null);
-            return  mediaSource;
-        }
-
-        @Override
-        protected void onPostExecute(MediaSource mediaSource) {
-            super.onPostExecute(mediaSource);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
-        }
     }
 
     private class MyExoPlayerStateListener implements ExoPlayer.EventListener {
