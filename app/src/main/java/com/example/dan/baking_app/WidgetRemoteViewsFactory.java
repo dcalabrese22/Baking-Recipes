@@ -94,6 +94,9 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
             rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
             rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
 
+            Intent fillInIntent = new Intent();
+            fillInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            rv.setOnClickFillInIntent(R.id.widget_ingredient_name, fillInIntent);
             return rv;
         }
     }

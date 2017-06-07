@@ -27,7 +27,6 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                          int appWidgetId) {
-        Log.d("updateAppWidgetMethod: ", "called");
         Intent intent = new Intent(context, WidgetAdapterService.class);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
@@ -37,10 +36,11 @@ public class BakingWidgetProvider extends AppWidgetProvider {
         rv.setRemoteAdapter(R.id.widget_listview, intent);
         rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
 
-//        Intent update = new Intent();
-//        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, update, PendingIntent.FLAG_UPDATE_CURRENT);
-//        rv.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
+        Intent openDetail = new Intent(context, RecipeDetailActivity.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openDetail, 0);
+        rv.setPendingIntentTemplate(R.id.widget_listview, pendingIntent);
+
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, rv);

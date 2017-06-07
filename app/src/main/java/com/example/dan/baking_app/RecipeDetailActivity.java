@@ -2,6 +2,9 @@ package com.example.dan.baking_app;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +15,7 @@ import android.view.animation.AnimationUtils;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
+import com.example.dan.baking_app.contentprovider.RecipeContract;
 import com.example.dan.baking_app.helpers.Constants;
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Step;
@@ -29,6 +33,8 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     private boolean mTwoPane;
     Toolbar mToolbar;
+
+    String mRecipeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,26 +99,94 @@ public class RecipeDetailActivity extends AppCompatActivity
     public void setMyTitle() {
         if (mTwoPane) {
             mToolbar.setTitle(getResources().getString(R.string.app_name));
-        } else {
+        } else if (getIntent().hasExtra(Constants.RECIPE_NAME_EXTRA)) {
             mToolbar.setTitle(getIntent().getExtras().getString(Constants.RECIPE_NAME_EXTRA));
+        } else {
+            SharedPreferences sharedPreferences = getSharedPreferences(Constants.WIDGET_PREFERENCE,
+                    Context.MODE_PRIVATE);
+            mRecipeName = sharedPreferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
+            mToolbar.setTitle(mRecipeName);
         }
     }
 
     @Override
     public ArrayList<Ingredient> passIngredients() {
-        mIngredients = getIntent().getExtras().getParcelableArrayList(Constants.INGREDIENT_EXTRA);
+        if (getIntent().hasExtra(Constants.INGREDIENT_EXTRA)) {
+            mIngredients = getIntent().getExtras().getParcelableArrayList(Constants.INGREDIENT_EXTRA);
+        } else {
+            mIngredients = new ArrayList<>();
+            Cursor cursor = getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
+                    null,
+                    RecipeContract.RecipeEntry.COLUMN_NAME + "=?",
+                    new String[]{mRecipeName},
+                    null);
+            int idIndex = cursor.getColumnIndex(RecipeContract.RecipeEntry._ID);
+            if (cursor.moveToFirst()) {
+                String selection = RecipeContract.IngredientEntry.FOREIGN_KEY + "=?";
+                String sortOrder = RecipeContract.IngredientEntry._ID;
+                cursor = getContentResolver().query(RecipeContract.IngredientEntry.CONTENT_URI,
+                        null, selection, new String[]{Integer.toString(cursor.getInt(idIndex))}, sortOrder);
+                makeIngredientsList(cursor);
+            }
+
+            cursor.close();
+        }
+
         return mIngredients;
+    }
+
+    public void makeIngredientsList(Cursor cursor) {
+        int ingNameIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_NAME);
+        int ingQuantityIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_QUANTITY);
+        int ingMeasureIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_MEASURE);
+        while (cursor.moveToNext()) {
+            String ingName = cursor.getString(ingNameIndex);
+            String ingMeasure = cursor.getString(ingMeasureIndex);
+            Double ingQuantity = cursor.getDouble(ingQuantityIndex);
+            Ingredient ingredient = new Ingredient(ingQuantity, ingMeasure, ingName);
+            mIngredients.add(ingredient);
+        }
+
     }
 
     @Override
     public ArrayList<Step> passSteps() {
-        mSteps = getIntent().getExtras().getParcelableArrayList(Constants.STEP_EXTRA);
+        if (getIntent().hasExtra(Constants.STEP_EXTRA)) {
+            mSteps = getIntent().getExtras().getParcelableArrayList(Constants.STEP_EXTRA);
+        } else {
+            mSteps = new ArrayList<>();
+            Cursor cursor = getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
+                    null,
+                    RecipeContract.RecipeEntry.COLUMN_NAME + "=?",
+                    new String[]{mRecipeName},
+                    null);
+            int idIndex = cursor.getColumnIndex(RecipeContract.RecipeEntry._ID);
+            if (cursor.moveToFirst()) {
+                String selection = RecipeContract.StepEntry.FOREIGN_KEY + "=?";
+                String sortOrder = RecipeContract.StepEntry._ID;
+                String[] selectionArgs = {Integer.toString(cursor.getInt(idIndex))};
+                cursor = getContentResolver().query(RecipeContract.StepEntry.CONTENT_URI,
+                        null,
+                        selection,
+                        selectionArgs,
+                        sortOrder);
+            }
+        }
         return mSteps;
+    }
+
+    public void makeStepsList(Cursor cursor) {
+        int descIndex = cursor.getColumnIndex()
     }
 
     @Override
     public String passRecipeName() {
-        return getIntent().getStringExtra(Constants.RECIPE_NAME_EXTRA);
+        if (getIntent().hasExtra(Constants.RECIPE_NAME_EXTRA)) {
+            return getIntent().getStringExtra(Constants.RECIPE_NAME_EXTRA);
+        } else {
+            return mRecipeName;
+
+        }
     }
 
     @Override
