@@ -2,7 +2,6 @@ package com.example.dan.baking_app;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +14,17 @@ import com.example.dan.baking_app.objects.Step;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+/**
+ * Adapter for populating recyclerview to contain recipe ingredients and steps
+ */
 public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    //arraylist if ingredients followed by steps
     private ArrayList<Object> mIngredientsAndSteps = new ArrayList<>();
 
     private StepClickHandler mStepClickHandler;
 
+    //distinguish viewtypes to populate correctly
     private static final int VIEWTYPE_INGREDIENT = 1;
     private static final int VIEWTYPE_STEP = 2;
 
@@ -53,16 +57,19 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
+
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         int viewType = getItemViewType(position);
-
+        //handle views that need to be populated with an ingredient
         if (viewType == VIEWTYPE_INGREDIENT) {
             TextView quantity = ((RecipeIngredientViewHolder) holder).ingredientQuantity;
             TextView name = ((RecipeIngredientViewHolder) holder).ingredientName;
             Ingredient ingredient = (Ingredient) mIngredientsAndSteps.get(position);
+            //strip zeros from double if necessary
             DecimalFormat df = new DecimalFormat("####.#");
             String quantityStr = df.format(ingredient.getQuantity());
+            //don't display unit for things like eggs
             if (ingredient.getMeasure().equals("UNIT")) {
                 quantity.setText(quantityStr);
             } else {
@@ -70,6 +77,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 quantity.setText(qAndMeasure);
             }
             name.setText(ingredient.getName());
+        //handles views that need to be populated with a step
         } else if (viewType == VIEWTYPE_STEP) {
             TextView shortDesc = ((RecipeStepViewHolder) holder).stepShortDesc;
             Step step = (Step) mIngredientsAndSteps.get(position);
@@ -81,11 +89,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-
+        //inflate the ingredient layout for ingredients
         if (viewType == VIEWTYPE_INGREDIENT) {
             int layoutForIngredient = R.layout.recipe_ingredient;
             View view = layoutInflater.inflate(layoutForIngredient, parent, false);
             return new RecipeIngredientViewHolder(view);
+        //inflate the step layout for steps
         } else {
             int layoutForStep = R.layout.recipe_step;
             View view = layoutInflater.inflate(layoutForStep, parent, false);
@@ -93,6 +102,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
+    //ViewHolder for Recipe Ingredients
     public class RecipeIngredientViewHolder  extends RecyclerView.ViewHolder{
 
         TextView ingredientQuantity;
@@ -106,6 +116,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     }
 
+    //ViewHolder for Recipe Steps
     public class RecipeStepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView stepShortDesc;

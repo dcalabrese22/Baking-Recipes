@@ -1,11 +1,10 @@
 package com.example.dan.baking_app.objects;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Class for representing a Recipe
+ */
 public class Recipe {
 
     private String mName;
@@ -20,11 +19,6 @@ public class Recipe {
         mServings = servings;
         mIngredients = ingredients;
         mSteps = steps;
-    }
-
-    public Recipe(String name, int servings) {
-        mName = name;
-        mServings = servings;
     }
 
     public String getName() {

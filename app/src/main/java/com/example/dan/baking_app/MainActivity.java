@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -27,25 +27,29 @@ import org.json.JSONArray;
 
 import java.util.ArrayList;
 
+/**
+ * Application's main activity
+ */
 public class MainActivity extends AppCompatActivity implements RecipeClickHandler {
 
-
     private MasterListAdapter mAdapter;
+    private static final int LAND_GRID_COLUMNS = 3;
+    private static final int PORT_GRID_COLUMNS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //find and set the title bar
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         tb.setTitle(getResources().getString(R.string.app_name));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_recipe_list);
-
         GridLayoutManager gridLayoutManager;
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            gridLayoutManager = new GridLayoutManager(this,3);
+            gridLayoutManager = new GridLayoutManager(this,LAND_GRID_COLUMNS);
         } else {
-            gridLayoutManager = new GridLayoutManager(this, 1);
+            gridLayoutManager = new GridLayoutManager(this, PORT_GRID_COLUMNS);
         }
 
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -58,30 +62,14 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
 
     }
 
-//    public void getOnlineRecipes() {
-//        String url = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
-//
-//        JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(url,
-//                new Response.Listener<JSONArray>() {
-//                    ArrayList<Recipe> recipes = new ArrayList<>();
-//
-//                    @Override
-//                    public void onResponse(JSONArray response) {
-//                        recipes = JsonResponseParser.parseTopLevelJsonRecipeData(response);
-//                        mAdapter.setRecipeData(recipes);
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                error.printStackTrace();
-//            }
-//        });
-//        MyRequestQueue.getInstance(this).addToRequestQueue(jsonObjectRequest);
-//    }
-
+    /**
+     * Gets recipes from online
+     */
     public void getOnlineRecipes() {
-        String url = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
+        String url =
+                "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
 
+        //user Volley to get data off main thread
         JsonArrayRequest jsonObjectRequest = new JsonArrayRequest(url,
                 new Response.Listener<JSONArray>() {
                     ArrayList<Recipe> recipes = new ArrayList<>();
@@ -90,20 +78,25 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
                     public void onResponse(JSONArray response) {
                         recipes = JsonResponseParser.parseTopLevelJsonRecipeData(response);
                         for (Recipe recipe : recipes) {
+
                             ContentValues recipeVals = new ContentValues();
                             recipeVals.put(RecipeContract.RecipeEntry.COLUMN_NAME, recipe.getName());
+                            //check if recipe is already in database
                             Cursor cursor = getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
                                     null,
                                     RecipeContract.RecipeEntry.COLUMN_NAME + "=?",
                                     new String[] {recipe.getName()},
                                     null);
+                            //move to the next recipe if it is
                             if (cursor.moveToNext()) {
 
                                 continue;
+                            //otherwise add the recipe to the database
                             } else {
                                 Uri uriId = getContentResolver()
                                         .insert(RecipeContract.RecipeEntry.CONTENT_URI, recipeVals);
                                 long id = ContentUris.parseId(uriId);
+                                //add the recipe's ingredients to the database
                                 for (Ingredient ingredient : recipe.getIngredients()) {
                                     ContentValues ingredientVals = new ContentValues();
                                     ingredientVals.put(RecipeContract.IngredientEntry.COLUMN_NAME,
@@ -117,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
                                     getContentResolver().
                                             insert(RecipeContract.IngredientEntry.CONTENT_URI, ingredientVals);
                                 }
+                                //add the recipe's steps to the database
                                 for (Step step : recipe.getSteps()) {
                                     ContentValues stepVals = new ContentValues();
                                     stepVals.put(RecipeContract.StepEntry.COLUMN_ID,
@@ -146,11 +140,16 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
         MyRequestQueue.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
+    /**
+     * Handles Recipe clicks
+     * @param recipe
+     */
     @Override
     public void onRecipeClick(Recipe recipe) {
         ArrayList<Ingredient> ingredients = recipe.getIngredients();
         ArrayList<Step> steps = recipe.getSteps();
 
+        //start recipe detail activity and pass the recipes ingredients and steps via the intent
         Intent intent = new Intent(this, RecipeDetailActivity.class);
         Bundle b = new Bundle();
         b.putString(Constants.RECIPE_NAME_EXTRA, recipe.getName());

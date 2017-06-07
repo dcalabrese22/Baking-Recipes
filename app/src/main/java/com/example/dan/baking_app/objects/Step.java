@@ -4,9 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by dcalabrese on 5/15/2017.
+ * Class for representing a Step of a Recipe. Parcelable for passing data with intents.
  */
-
 public class Step implements Parcelable {
 
     private String mShortDescription;

@@ -2,18 +2,13 @@ package com.example.dan.baking_app;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,20 +31,22 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 
+/**
+ * Fragment for displaying a single recipe step
+ */
 public class StepFragment extends Fragment {
 
     String mDescription;
     String mVideoUrl;
     int mId;
+
     ArrayList<Step> mSteps;
     PassRecipeDataHandler mHandler;
+
     SimpleExoPlayerView mPlayerView;
     SimpleExoPlayer mExoPlayer;
     TextView mDescTextView;
@@ -57,15 +54,17 @@ public class StepFragment extends Fragment {
     ImageButton mBack;
     ProgressBar mProgressbar;
     long mVideoPosition;
+
     boolean mTwoPane;
 
-
-
+    private static final String USER_AGENT = "ua";
     public StepFragment(){}
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
         View rootview = inflater.inflate(R.layout.fragment_step_detail, container, false);
         mDescTextView = (TextView) rootview.findViewById(R.id.textview_step_description);
         mProgressbar = (ProgressBar) rootview.findViewById(R.id.progress_bar);
@@ -178,12 +177,16 @@ public class StepFragment extends Fragment {
         mHandler = (PassRecipeDataHandler) context;
         mSteps = mHandler.passSteps();
         mDescription = getArguments().getString(Constants.DESC_STEP_EXTRA);
-
         mVideoUrl = getArguments().getString(Constants.URL_STEP_EXTRA);
         mId = getArguments().getInt(Constants.ID_STEP_EXTRA);
         mTwoPane = getArguments().getBoolean(Constants.TWO_PANE_EXTRA);
     }
 
+    /**
+     * Initializes an ExoPlayer with a media source
+     *
+     * @param url String url source
+     */
     public void initializePlayer(String url) {
         if (mExoPlayer == null) {
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(
@@ -200,12 +203,22 @@ public class StepFragment extends Fragment {
         }
     }
 
+    /**
+     * Builds a media source for ExoPlayer
+     *
+     * @param uri Uri of source
+     * @return MediaSource
+     */
     private MediaSource buildMediaSource(Uri uri) {
         return new ExtractorMediaSource(uri,
-                new DefaultHttpDataSourceFactory("ua"),
+                new DefaultHttpDataSourceFactory(USER_AGENT),
                 new DefaultExtractorsFactory(), null, null);
     }
 
+    /**
+     * Gets a Step's movie if there is on. Used for the forward and back buttons when cycling
+     * through steps
+     */
     public void getMovie() {
         mVideoUrl = mSteps.get(mId).getVideoUrl();
         if (!mVideoUrl.equals("")) {
@@ -228,7 +241,6 @@ public class StepFragment extends Fragment {
 
     public void releasePlayer() {
         mExoPlayer.stop();
-        
         mExoPlayer.release();
         mExoPlayer = null;
     }
@@ -245,6 +257,9 @@ public class StepFragment extends Fragment {
 
     }
 
+    /**
+     * Custom ExoPlayer Eventlistener for determining when to show the progress bar
+     */
     private class MyExoPlayerStateListener implements ExoPlayer.EventListener {
         @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {}

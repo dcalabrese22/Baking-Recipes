@@ -5,9 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by dcalabrese on 6/2/2017.
+ * Class for building the recipe database
  */
-
 public class RecipeDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "recipeDb.db";

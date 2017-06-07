@@ -11,43 +11,57 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-
+/**
+ * Content provider for accessing recipe data stored in database
+ */
 public class RecipeContentProvider extends ContentProvider {
 
     public static final int RECIPE = 100;
-    public static final int RECIPE_WITH_ID = 101;
-    public static final int RECIPE_WITH_NAME = 102;
 
     public static final int INGREDIENT = 200;
-    public static final int INGREDIENT_WITH_ID = 201;
 
     public static final int STEP = 300;
-    public static final int STEP_WITH_ID = 301;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
+    /**
+     * Builds a UriMatcher for custom provider
+     *
+     * @return UriMather object
+     */
     public static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         uriMatcher.addURI(RecipeContract.AUTHORITY, RecipeContract.PATH_RECIPE, RECIPE);
-        uriMatcher.addURI(RecipeContract.AUTHORITY, RecipeContract.PATH_RECIPE + "/#", RECIPE_WITH_ID);
-        uriMatcher.addURI(RecipeContract.AUTHORITY, RecipeContract.PATH_RECIPE + "/name", RECIPE_WITH_NAME);
         uriMatcher.addURI(RecipeContract.AUTHORITY, RecipeContract.PATH_INGREDIENT, INGREDIENT);
-        uriMatcher.addURI(RecipeContract.AUTHORITY, RecipeContract.PATH_INGREDIENT + "/#", INGREDIENT_WITH_ID);
         uriMatcher.addURI(RecipeContract.AUTHORITY, RecipeContract.PATH_STEP, STEP);
-        uriMatcher.addURI(RecipeContract.AUTHORITY, RecipeContract.PATH_STEP + "/#", STEP_WITH_ID);
 
         return uriMatcher;
     }
 
     private RecipeDbHelper mHelper;
 
+    /**
+     * Creates new RecipeDbHelper
+     *
+     * @return Boolean true that RecipeDbHelper was created
+     */
     @Override
     public boolean onCreate() {
         mHelper = new RecipeDbHelper(getContext());
         return true;
     }
 
+    /**
+     * Queries the database
+     *
+     * @param uri The Uri to query
+     * @param projection The table columns to select
+     * @param selection SQL where clause
+     * @param selectionArgs SQL where clause arguments
+     * @param sortOrder Results sorting order
+     * @return Cursor pointing to queried results
+     */
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection,
@@ -59,15 +73,6 @@ public class RecipeContentProvider extends ContentProvider {
 
         switch (match) {
             case RECIPE:
-                cursor = db.query(RecipeContract.RecipeEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-            case RECIPE_WITH_NAME:
                 cursor = db.query(RecipeContract.RecipeEntry.TABLE_NAME,
                         projection,
                         selection,
@@ -108,6 +113,13 @@ public class RecipeContentProvider extends ContentProvider {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    /**
+     * Inserts data into the database
+     *
+     * @param uri Uri of table to insert into
+     * @param values ContentValues to insert
+     * @return
+     */
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
@@ -149,34 +161,8 @@ public class RecipeContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String selection,
-                      @Nullable String[] selectionArgs) {
-        final SQLiteDatabase db = mHelper.getWritableDatabase();
-
-        int match = sUriMatcher.match(uri);
-        int deleted;
-        String id;
-
-        switch (match) {
-            case RECIPE_WITH_ID:
-                id = uri.getPathSegments().get(1);
-                deleted = db.delete(RecipeContract.RecipeEntry.TABLE_NAME, "_id=?", new String[] {id});
-                break;
-            case INGREDIENT_WITH_ID:
-                id = uri.getPathSegments().get(1);
-                deleted = db.delete(RecipeContract.IngredientEntry.TABLE_NAME, "_id=?", new String[] {id});
-                break;
-            case STEP_WITH_ID:
-                id = uri.getPathSegments().get(1);
-                deleted = db.delete(RecipeContract.StepEntry.TABLE_NAME, "_id=?", new String[] {id});
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
-        if (deleted != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-        return deleted;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        return 0;
     }
 
     @Override

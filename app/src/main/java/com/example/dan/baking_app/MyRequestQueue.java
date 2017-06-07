@@ -6,6 +6,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
+/**
+ * Custom requestqueue singlton for queuing volley requests
+ */
 public class MyRequestQueue {
 
     private static MyRequestQueue mInstance;
