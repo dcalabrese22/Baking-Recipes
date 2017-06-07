@@ -12,7 +12,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "recipeDb.db";
 
-    private static final int VERSION = 3;
+    private static final int VERSION = 4;
 
     public RecipeDbHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
@@ -44,6 +44,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
         final String CREATE_STEP_TABLE =
                 "Create Table " + RecipeContract.StepEntry.TABLE_NAME + " (" +
                         RecipeContract.StepEntry._ID                + " Integer Primary Key Autoincrement, "  +
+                        RecipeContract.StepEntry.COLUMN_ID          + " Integer Not Null, "     +
                         RecipeContract.StepEntry.COLUMN_DESCRIPTION + " Text Not Null, "        +
                         RecipeContract.StepEntry.COLUMN_SHORT_DESC  + " Text Not Null, "        +
                         RecipeContract.StepEntry.COLUMN_URL         + " Text Not Null, "        +

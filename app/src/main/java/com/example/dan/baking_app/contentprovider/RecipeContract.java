@@ -44,6 +44,7 @@ public class RecipeContract {
                 .appendPath(PATH_STEP).build();
 
         public static final String TABLE_NAME = "step";
+        public static final String COLUMN_ID = "step_id";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_SHORT_DESC = "short_description";
         public static final String COLUMN_URL = "url";

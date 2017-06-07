@@ -170,13 +170,25 @@ public class RecipeDetailActivity extends AppCompatActivity
                         selection,
                         selectionArgs,
                         sortOrder);
+                makeStepsList(cursor);
             }
         }
         return mSteps;
     }
 
     public void makeStepsList(Cursor cursor) {
-        int descIndex = cursor.getColumnIndex()
+        int stepIdIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_ID);
+        int descIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_DESCRIPTION);
+        int shortDescIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_SHORT_DESC);
+        int urlIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_URL);
+        while (cursor.moveToNext()) {
+            int stepId = cursor.getInt(stepIdIndex);
+            String desc = cursor.getString(descIndex);
+            String shortDesc = cursor.getString(shortDescIndex);
+            String url = cursor.getString(urlIndex);
+            Step step = new Step(stepId, shortDesc, desc, url);
+            mSteps.add(step);
+        }
     }
 
     @Override

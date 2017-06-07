@@ -119,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
                                 }
                                 for (Step step : recipe.getSteps()) {
                                     ContentValues stepVals = new ContentValues();
+                                    stepVals.put(RecipeContract.StepEntry.COLUMN_ID,
+                                            step.getId());
                                     stepVals.put(RecipeContract.StepEntry.COLUMN_DESCRIPTION,
                                             step.getDescription());
                                     stepVals.put(RecipeContract.StepEntry.COLUMN_SHORT_DESC,

@@ -209,9 +209,12 @@ public class StepFragment extends Fragment {
     public void getMovie() {
         mVideoUrl = mSteps.get(mId).getVideoUrl();
         if (!mVideoUrl.equals("")) {
+            mProgressbar.setVisibility(View.VISIBLE);
+            mPlayerView.setVisibility(View.VISIBLE);
             Uri mediaUri = Uri.parse(mVideoUrl);
             mExoPlayer.prepare(buildMediaSource(mediaUri), true, true);
         } else {
+            mProgressbar.setVisibility(View.GONE);
             mPlayerView.setVisibility(View.GONE);
         }
 
