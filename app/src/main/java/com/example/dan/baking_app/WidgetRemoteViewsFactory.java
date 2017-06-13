@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -14,6 +15,9 @@ import com.example.dan.baking_app.objects.Ingredient;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+/**
+ * Class that populates widget views
+ */
 public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory{
 
     private Context mContext;
@@ -22,11 +26,12 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     public WidgetRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
-        mIngredients = new ArrayList<>();
+
     }
 
     @Override
     public void onCreate() {
+        mIngredients = new ArrayList<>();
         SharedPreferences preferences = mContext.
                 getSharedPreferences(Constants.WIDGET_PREFERENCE, Context.MODE_PRIVATE);
         mRecipeName = preferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
@@ -52,6 +57,7 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
         SharedPreferences preferences = mContext.
                 getSharedPreferences(Constants.WIDGET_PREFERENCE, Context.MODE_PRIVATE);
         mRecipeName = preferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
+
         if (mRecipeName != null) {
             getData(mRecipeName);
         }
@@ -59,7 +65,7 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 2;
     }
 
     public String getIngredientQuantity(Ingredient ingredient) {
@@ -75,17 +81,22 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     @Override
     public RemoteViews getViewAt(int position) {
-            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget);
-            Ingredient ingredient = mIngredients.get(position);
-            rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
-            rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
-
-            Intent fillInIntent = new Intent();
-            fillInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            rv.setOnClickFillInIntent(R.id.widget_ingredient_name, fillInIntent);
-            return rv;
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget);
+        Ingredient ingredient = mIngredients.get(position);
+        rv.setTextViewText(R.id.widget_quantity, getIngredientQuantity(ingredient));
+        rv.setTextViewText(R.id.widget_ingredient_name, ingredient.getName());
+        Intent fillInIntent = new Intent();
+        fillInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        rv.setOnClickFillInIntent(R.id.widget_quantity, fillInIntent);
+        rv.setOnClickFillInIntent(R.id.widget_ingredient_name, fillInIntent);
+        return rv;
     }
 
+    /**
+     * Gets the data from the content provider
+     *
+     * @param recipeName The name of the recipe
+     */
     public void getData(String recipeName) {
         String selection = RecipeContract.RecipeEntry.COLUMN_NAME + "=?";
         Cursor cursor = mContext.getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
@@ -107,6 +118,11 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
         cursor.close();
     }
 
+    /**
+     * Creates an arraylist of Ingredients
+     *
+     * @param cursor Cursor that points to query results
+     */
     public void makeIngredientsList(Cursor cursor) {
         int ingNameIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_NAME);
         int ingQuantityIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_QUANTITY);

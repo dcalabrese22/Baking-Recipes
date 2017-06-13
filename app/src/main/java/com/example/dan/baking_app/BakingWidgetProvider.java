@@ -8,9 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.dan.baking_app.helpers.Constants;
+
+import java.util.Date;
 
 /**
  *Widget that shows a user specified recipe's ingredients
@@ -35,20 +38,18 @@ public class BakingWidgetProvider extends AppWidgetProvider {
         SharedPreferences preferences = context.
                 getSharedPreferences(Constants.WIDGET_PREFERENCE, Context.MODE_PRIVATE);
         String recipeName = preferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
-
         // Construct the RemoteViews object, set adapter, recipe title, and empty view
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
-        rv.setTextViewText(R.id.widget_recipe_title, recipeName);
-        rv.setRemoteAdapter(R.id.widget_listview, intent);
+        //rv.setRemoteAdapter(R.id.widget_listview, intent);
         rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
+        rv.setTextViewText(R.id.widget_recipe_title, recipeName);
 
         //create intent that handles widget clicks
         Intent openDetail = new Intent(context, RecipeDetailActivity.class);
-        //pendingIntent to call intnet
+        //pendingIntent to call intent
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, openDetail, 0);
         //add PendingIntent to remoteview
         rv.setPendingIntentTemplate(R.id.widget_listview, pendingIntent);
-
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, rv);
@@ -78,11 +79,10 @@ public class BakingWidgetProvider extends AppWidgetProvider {
      * Receives broadcasts sent to Widget
      *
      * @param context Application context
-     * @param intent Intent that was broadcasted
+     * @param intent Intent that was broadcast
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BakingWidgetProvider.class.getName());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
@@ -92,11 +92,12 @@ public class BakingWidgetProvider extends AppWidgetProvider {
             int appWidgetId = intent.getIntExtra(
                     AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID);
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_listview);
 
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+
+                    updateAppWidget(context, appWidgetManager, appWidgetId);
         }
         super.onReceive(context, intent);
-
     }
 
 
