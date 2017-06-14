@@ -40,7 +40,7 @@ public class BakingWidgetProvider extends AppWidgetProvider {
         String recipeName = preferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
         // Construct the RemoteViews object, set adapter, recipe title, and empty view
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.baking_widget_provider);
-        //rv.setRemoteAdapter(R.id.widget_listview, intent);
+        rv.setRemoteAdapter(R.id.widget_listview, intent);
         rv.setEmptyView(R.id.widget_listview, R.id.widget_empty);
         rv.setTextViewText(R.id.widget_recipe_title, recipeName);
 
@@ -53,6 +53,8 @@ public class BakingWidgetProvider extends AppWidgetProvider {
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, rv);
+        ComponentName componentName = new ComponentName(context, BakingWidgetProvider.class);
+        AppWidgetManager.getInstance(context).updateAppWidget(componentName, rv);
 
     }
 
@@ -83,6 +85,7 @@ public class BakingWidgetProvider extends AppWidgetProvider {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BakingWidgetProvider.class.getName());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
@@ -92,12 +95,10 @@ public class BakingWidgetProvider extends AppWidgetProvider {
             int appWidgetId = intent.getIntExtra(
                     AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID);
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_listview);
+            updateAppWidget(context, appWidgetManager, appWidgetId);
 
-
-                    updateAppWidget(context, appWidgetManager, appWidgetId);
         }
-        super.onReceive(context, intent);
+
     }
 
 
