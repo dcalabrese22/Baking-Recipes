@@ -1,7 +1,5 @@
 package com.example.dan.baking_app.helpers;
 
-import android.util.Log;
-
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Recipe;
 import com.example.dan.baking_app.objects.Step;
@@ -12,6 +10,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+/**
+ * Helper class for parsing JSON data
+ */
 public class JsonResponseParser {
 
     private static final String NAME = "name";
@@ -29,6 +30,12 @@ public class JsonResponseParser {
 
     private static final String SERVINGS = "servings";
 
+    /**
+     * Parses the top level JSON response data
+     *
+     * @param response HTTP response as a JSONArray
+     * @return ArrayList of Recipe objects
+     */
     public static ArrayList<Recipe> parseTopLevelJsonRecipeData(JSONArray response) {
         ArrayList<Recipe> recipes = new ArrayList<>();
 
@@ -54,6 +61,12 @@ public class JsonResponseParser {
         return recipes;
     }
 
+    /**
+     * Parses JSON response data that correspond to recipe ingredients
+     *
+     * @param response HTTP response as JSONObject
+     * @return ArrayList of Ingredient objects
+     */
     public static ArrayList<Ingredient> parseIngredientsJsonData(JSONObject response) {
         ArrayList<Ingredient> ingredientsList = new ArrayList<>();
 
@@ -79,6 +92,12 @@ public class JsonResponseParser {
         return ingredientsList;
     }
 
+    /**
+     * Parses JSON response data that corresponds to recipe steps
+     *
+     * @param response HTTP response as JSONObject
+     * @return ArrayList of Step Objects
+     */
     public static ArrayList<Step> parseStepJsonData(JSONObject response) {
         ArrayList<Step> stepsList = new ArrayList<>();
 

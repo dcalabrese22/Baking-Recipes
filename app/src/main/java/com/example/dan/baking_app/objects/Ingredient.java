@@ -3,6 +3,9 @@ package com.example.dan.baking_app.objects;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Class representing a Recipe's Ingredient. Parcelable to allowing passing data through intents
+ */
 public class Ingredient implements Parcelable {
 
     private double mQuantity;

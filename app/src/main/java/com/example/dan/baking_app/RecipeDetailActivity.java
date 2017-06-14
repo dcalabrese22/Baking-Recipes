@@ -8,10 +8,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
@@ -22,8 +19,12 @@ import com.example.dan.baking_app.objects.Step;
 
 import java.util.ArrayList;
 
+/**
+ * Activity that displays a recipe's details
+ */
 public class RecipeDetailActivity extends AppCompatActivity
         implements PassRecipeDataHandler, StepClickHandler{
+
 
     StepFragment mStepFragment;
     RecipeFragment mRecipeFragment;
@@ -31,7 +32,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     ArrayList<Ingredient> mIngredients;
     ArrayList<Step> mSteps;
 
-    private boolean mTwoPane;
+    private boolean mTwoPane;//for determining if the device should show the fragments side by side
     Toolbar mToolbar;
 
     String mRecipeName;
@@ -40,10 +41,12 @@ public class RecipeDetailActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
+        //find and set the toolbar title appropriately
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setMyTitle();
         setSupportActionBar(mToolbar);
 
+        //hide toolbar if video is displaying fullscreen
         View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
@@ -55,9 +58,12 @@ public class RecipeDetailActivity extends AppCompatActivity
                 }
             }
         });
+
         FragmentManager fragmentManager = getFragmentManager();
+        //if the device is a tablet its layout will have R.id.two_pane
         if (findViewById(R.id.two_pane) != null) {
             mTwoPane = true;
+            //find the fragment if coming from a onSavedInstanceState call
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(Constants.STEP_KEY)) {
                     mStepFragment = (StepFragment) getFragmentManager()
@@ -67,14 +73,15 @@ public class RecipeDetailActivity extends AppCompatActivity
                             .getFragment(savedInstanceState, Constants.RECIPE_KEY);
                 }
             } else {
-
+                //create a new RecipeFragment
                 mRecipeFragment = new RecipeFragment();
-
                 fragmentManager.beginTransaction()
                         .replace(R.id.recipe_list_container, mRecipeFragment, Constants.RECIPE_KEY)
                         .commit();
             }
-            } else {
+        //if R.id.two_pane wasn't found, the device isn't large enough to support side by side
+        //fragments
+        } else {
             mTwoPane = false;
             if (savedInstanceState != null) {
                 if (savedInstanceState.containsKey(Constants.STEP_KEY)) {
@@ -87,8 +94,6 @@ public class RecipeDetailActivity extends AppCompatActivity
             } else {
 
                 mRecipeFragment = new RecipeFragment();
-
-
                 fragmentManager.beginTransaction()
                         .replace(R.id.activity_recipe_detail, mRecipeFragment, Constants.RECIPE_KEY)
                         .commit();
@@ -96,11 +101,17 @@ public class RecipeDetailActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Sets the toolbar title appropriately
+     */
     public void setMyTitle() {
+        //two pane mode sets generic title
         if (mTwoPane) {
             mToolbar.setTitle(getResources().getString(R.string.app_name));
+        //single pane sets specific title
         } else if (getIntent().hasExtra(Constants.RECIPE_NAME_EXTRA)) {
             mToolbar.setTitle(getIntent().getExtras().getString(Constants.RECIPE_NAME_EXTRA));
+        //if activity is launched from widget, get correct title
         } else {
             SharedPreferences sharedPreferences = getSharedPreferences(Constants.WIDGET_PREFERENCE,
                     Context.MODE_PRIVATE);
@@ -109,10 +120,17 @@ public class RecipeDetailActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Method for passing Ingredient ArrayList to fragment
+     * @return ArrayList of Ingredients
+     */
     @Override
     public ArrayList<Ingredient> passIngredients() {
+        //if we came from main activity, the data was passed in the intent
         if (getIntent().hasExtra(Constants.INGREDIENT_EXTRA)) {
-            mIngredients = getIntent().getExtras().getParcelableArrayList(Constants.INGREDIENT_EXTRA);
+            mIngredients = getIntent().getExtras()
+                    .getParcelableArrayList(Constants.INGREDIENT_EXTRA);
+        //if we came from the widget, the data needs to be queried from the database
         } else {
             mIngredients = new ArrayList<>();
             Cursor cursor = getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
@@ -135,6 +153,11 @@ public class RecipeDetailActivity extends AppCompatActivity
         return mIngredients;
     }
 
+    /**
+     * Creates an ArrayList of Ingredients from a database query
+     *
+     * @param cursor Cursor pointing to database query of ingredients
+     */
     public void makeIngredientsList(Cursor cursor) {
         int ingNameIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_NAME);
         int ingQuantityIndex = cursor.getColumnIndex(RecipeContract.IngredientEntry.COLUMN_QUANTITY);
@@ -149,10 +172,17 @@ public class RecipeDetailActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Method for passing Step ArrayList to fragment
+     *
+     * @return ArrayList of Steps
+     */
     @Override
     public ArrayList<Step> passSteps() {
+        //if we came from main activity, the step data was passed as an extra
         if (getIntent().hasExtra(Constants.STEP_EXTRA)) {
             mSteps = getIntent().getExtras().getParcelableArrayList(Constants.STEP_EXTRA);
+        //if we came from the widget, the step data needs to be queried
         } else {
             mSteps = new ArrayList<>();
             Cursor cursor = getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
@@ -176,6 +206,11 @@ public class RecipeDetailActivity extends AppCompatActivity
         return mSteps;
     }
 
+    /**
+     * Creates ArrayList of Steps from database query
+     *
+     * @param cursor Cursor pointing to database query of steps
+     */
     public void makeStepsList(Cursor cursor) {
         int stepIdIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_ID);
         int descIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_DESCRIPTION);
@@ -191,22 +226,35 @@ public class RecipeDetailActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Method for passing the Recipe name to fragment
+     *
+     * @return String recipe name
+     */
     @Override
     public String passRecipeName() {
+        //if we came from main activity, the recipe name was passed in the intent
         if (getIntent().hasExtra(Constants.RECIPE_NAME_EXTRA)) {
             return getIntent().getStringExtra(Constants.RECIPE_NAME_EXTRA);
+        //if we came from the widget, the recipe name came from shared preferences
         } else {
             return mRecipeName;
 
         }
     }
 
+    /**
+     * Handles when recipe steps are clicked
+     *
+     * @param step The Step clicked
+     */
     @Override
     public void onStepClick(Step step) {
         FragmentManager fragmentManager = getFragmentManager();
         String desc = step.getDescription();
         String url = step.getVideoUrl();
         int id = step.getId();
+        //bundle recipe details to pass to StepFragment
         Bundle bundle = new Bundle();
         bundle.putString(Constants.DESC_STEP_EXTRA, desc);
         bundle.putString(Constants.URL_STEP_EXTRA, url);
@@ -215,6 +263,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         mStepFragment = new StepFragment();
         mStepFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        //add the fragment to the appropriate container depending on if the device is a tablet
         if (mTwoPane) {
             fragmentTransaction.add(R.id.step_container, mStepFragment, Constants.STEP_KEY);
             fragmentTransaction.commit();

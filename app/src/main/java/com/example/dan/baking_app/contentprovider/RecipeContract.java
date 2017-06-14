@@ -4,9 +4,8 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Created by dcalabrese on 6/2/2017.
+ * Class for defining the database and database tables
  */
-
 public class RecipeContract {
 
     public static final String AUTHORITY = "com.example.dan.baking_app";

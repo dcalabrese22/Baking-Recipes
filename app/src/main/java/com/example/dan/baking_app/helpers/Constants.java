@@ -1,9 +1,8 @@
 package com.example.dan.baking_app.helpers;
 
 /**
- * Created by dcalabrese on 6/5/2017.
+ * Class for defining globally used constants
  */
-
 public class Constants {
 
     public static final String INGREDIENT_EXTRA = "ingredient_extra";
@@ -19,7 +18,6 @@ public class Constants {
 
     public static final String SAVED_STATE_INGREDIENTS = "ingredients";
     public static final String SAVED_STATE_STEPS = "steps";
-    public static final String SAVED_RECIPE_NAME = "recipe_name";
 
     public static final String STATE_STEPS = "steps";
     public static final String STATE_ID = "id";

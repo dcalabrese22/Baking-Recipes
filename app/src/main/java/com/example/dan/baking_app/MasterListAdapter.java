@@ -12,6 +12,9 @@ import com.example.dan.baking_app.objects.Recipe;
 
 import java.util.ArrayList;
 
+/**
+ * Adapter for populating the main activity's recyclerviews with recipes
+ */
 public class MasterListAdapter extends
         RecyclerView.Adapter<MasterListAdapter.RecipeViewHolder> {
 
