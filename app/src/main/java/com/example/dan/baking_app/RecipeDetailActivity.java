@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
@@ -43,21 +44,11 @@ public class RecipeDetailActivity extends AppCompatActivity
         setContentView(R.layout.activity_recipe_detail);
         //find and set the toolbar title appropriately
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setMyTitle();
-        setSupportActionBar(mToolbar);
 
-        //hide toolbar if video is displaying fullscreen
-        View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-            @Override
-            public void onSystemUiVisibilityChange(int i) {
-                if ((i & View.SYSTEM_UI_FLAG_FULLSCREEN) == View.VISIBLE) {
-                    getSupportActionBar().show();
-                } else {
-                    getSupportActionBar().hide();
-                }
-            }
-        });
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.WIDGET_PREFERENCE,
+                Context.MODE_PRIVATE);
+        mRecipeName = sharedPreferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
+
 
         FragmentManager fragmentManager = getFragmentManager();
         //if the device is a tablet its layout will have R.id.two_pane
@@ -99,6 +90,21 @@ public class RecipeDetailActivity extends AppCompatActivity
                         .commit();
             }
         }
+        setMyTitle();
+        setSupportActionBar(mToolbar);
+
+        //hide toolbar if video is displaying fullscreen
+        View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int i) {
+                if ((i & View.SYSTEM_UI_FLAG_FULLSCREEN) == View.VISIBLE) {
+                    getSupportActionBar().show();
+                } else {
+                    getSupportActionBar().hide();
+                }
+            }
+        });
     }
 
     /**
@@ -113,9 +119,6 @@ public class RecipeDetailActivity extends AppCompatActivity
             mToolbar.setTitle(getIntent().getExtras().getString(Constants.RECIPE_NAME_EXTRA));
         //if activity is launched from widget, get correct title
         } else {
-            SharedPreferences sharedPreferences = getSharedPreferences(Constants.WIDGET_PREFERENCE,
-                    Context.MODE_PRIVATE);
-            mRecipeName = sharedPreferences.getString(Constants.PREFERENCE_INGREDIENT_NAME, null);
             mToolbar.setTitle(mRecipeName);
         }
     }
@@ -133,6 +136,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         //if we came from the widget, the data needs to be queried from the database
         } else {
             mIngredients = new ArrayList<>();
+            Log.d("Came from", "widget");
             Cursor cursor = getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
                     null,
                     RecipeContract.RecipeEntry.COLUMN_NAME + "=?",
