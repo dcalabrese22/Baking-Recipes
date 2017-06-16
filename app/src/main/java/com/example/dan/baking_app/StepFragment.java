@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +87,7 @@ public class StepFragment extends Fragment {
             initializePlayer(mVideoUrl);
             mExoPlayer.addListener(new MyExoPlayerStateListener());
             mExoPlayer.seekTo(mVideoPosition);
+            mExoPlayer.setPlayWhenReady(true);
             if (getResources().getConfiguration().orientation ==
                     Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
                 mDescTextView.setVisibility(View.VISIBLE);
@@ -237,6 +239,20 @@ public class StepFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         releasePlayer();
+    }
+
+    @Override
+    public void onResume() {
+        Log.d("StepFragment", "onResume Called");
+        super.onResume();
+        mExoPlayer.setPlayWhenReady(true);
+    }
+
+    @Override
+    public void onPause() {
+        Log.d("StepFragment", "onPause Called");
+        super.onPause();
+        mExoPlayer.stop();
     }
 
     public void releasePlayer() {
