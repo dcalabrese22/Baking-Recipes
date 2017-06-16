@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 public class RecipeDetailActivity extends AppCompatActivity
         implements PassRecipeDataHandler, StepClickHandler{
 
+    private String TAG = "Recipe Detail Activity";
 
     StepFragment mStepFragment;
     RecipeFragment mRecipeFragment;
@@ -75,6 +77,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         } else {
             mTwoPane = false;
             if (savedInstanceState != null) {
+                Log.d("detail activity", "saved state");
                 if (savedInstanceState.containsKey(Constants.STEP_KEY)) {
                     mStepFragment = (StepFragment) getFragmentManager()
                             .getFragment(savedInstanceState, Constants.STEP_KEY);
@@ -85,9 +88,10 @@ public class RecipeDetailActivity extends AppCompatActivity
             } else {
 
                 mRecipeFragment = new RecipeFragment();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.activity_recipe_detail, mRecipeFragment, Constants.RECIPE_KEY)
-                        .commit();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.activity_recipe_detail,
+                        mRecipeFragment, Constants.RECIPE_KEY);
+                fragmentTransaction.commit();
             }
         }
         setMyTitle();
@@ -105,6 +109,18 @@ public class RecipeDetailActivity extends AppCompatActivity
                 }
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        Log.d(TAG, "onSaveInstanceState called");
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.putFragment(outState, Constants.RECIPE_KEY, mRecipeFragment);
+        if (mStepFragment.isVisible()) {
+            fragmentManager.putFragment(outState, Constants.STEP_KEY, mStepFragment);
+        }
+
     }
 
     /**
@@ -220,12 +236,14 @@ public class RecipeDetailActivity extends AppCompatActivity
         int descIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_DESCRIPTION);
         int shortDescIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_SHORT_DESC);
         int urlIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_URL);
+        int thumbUrlIndex = cursor.getColumnIndex(RecipeContract.StepEntry.COLUMN_THUMB_URL);
         while (cursor.moveToNext()) {
             int stepId = cursor.getInt(stepIdIndex);
             String desc = cursor.getString(descIndex);
             String shortDesc = cursor.getString(shortDescIndex);
             String url = cursor.getString(urlIndex);
-            Step step = new Step(stepId, shortDesc, desc, url);
+            String thumbUrl = cursor.getString(thumbUrlIndex);
+            Step step = new Step(stepId, shortDesc, desc, url, thumbUrl);
             mSteps.add(step);
         }
     }

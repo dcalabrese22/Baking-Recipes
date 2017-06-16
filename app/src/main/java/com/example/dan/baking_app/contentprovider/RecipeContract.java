@@ -47,6 +47,7 @@ public class RecipeContract {
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_SHORT_DESC = "short_description";
         public static final String COLUMN_URL = "url";
+        public static final String COLUMN_THUMB_URL = "thumbnail_url";
         public static final String FOREIGN_KEY = "recipe_id";
 
     }

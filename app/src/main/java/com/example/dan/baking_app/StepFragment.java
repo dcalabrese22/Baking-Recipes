@@ -58,6 +58,8 @@ public class StepFragment extends Fragment {
 
     boolean mTwoPane;
 
+    private String TAG = "Step Fragment";
+
     private static final String USER_AGENT = "ua";
     public StepFragment(){}
 
@@ -78,16 +80,13 @@ public class StepFragment extends Fragment {
 
 
         if (savedInstanceState != null) {
-
             mVideoUrl = savedInstanceState.getString(Constants.STATE_URL);
             mId = savedInstanceState.getInt(Constants.STATE_ID);
             mDescription = savedInstanceState.getString(Constants.STATE_DESCRIPTION);
             mSteps = savedInstanceState.getParcelableArrayList(Constants.STATE_STEPS);
             mVideoPosition = savedInstanceState.getLong(Constants.STATE_VIDEO_POSITION);
-            initializePlayer(mVideoUrl);
-            mExoPlayer.addListener(new MyExoPlayerStateListener());
-            mExoPlayer.seekTo(mVideoPosition);
-            mExoPlayer.setPlayWhenReady(true);
+            initializePlayer(mVideoUrl, mVideoPosition);
+
             if (getResources().getConfiguration().orientation ==
                     Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
                 mDescTextView.setVisibility(View.VISIBLE);
@@ -128,9 +127,7 @@ public class StepFragment extends Fragment {
 
             }
         } else {
-            initializePlayer(mVideoUrl);
-
-            mExoPlayer.addListener(new MyExoPlayerStateListener());
+            initializePlayer(mVideoUrl, mVideoPosition);
 
             if (getResources().getConfiguration().orientation ==
                     Configuration.ORIENTATION_PORTRAIT || mTwoPane) {
@@ -189,16 +186,18 @@ public class StepFragment extends Fragment {
      *
      * @param url String url source
      */
-    public void initializePlayer(String url) {
+    public void initializePlayer(String url, long videoPosition) {
         if (mExoPlayer == null) {
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(
                     new DefaultRenderersFactory(getContext()),
                     new DefaultTrackSelector(), new DefaultLoadControl());
+            mExoPlayer.addListener(new MyExoPlayerStateListener());
             mPlayerView.setPlayer(mExoPlayer);
             mExoPlayer.setPlayWhenReady(true);
             if (!url.equals("")) {
                 Uri mediaUri = Uri.parse(url);
                 mExoPlayer.prepare(buildMediaSource(mediaUri), true, true);
+                mExoPlayer.seekTo(videoPosition);
             } else {
                 mPlayerView.setVisibility(View.GONE);
             }
@@ -236,26 +235,21 @@ public class StepFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume called " + Long.toString(mVideoPosition));
+        initializePlayer(mVideoUrl, mVideoPosition);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop called");
         releasePlayer();
     }
 
-    @Override
-    public void onResume() {
-        Log.d("StepFragment", "onResume Called");
-        super.onResume();
-        mExoPlayer.setPlayWhenReady(true);
-    }
-
-    @Override
-    public void onPause() {
-        Log.d("StepFragment", "onPause Called");
-        super.onPause();
-        mExoPlayer.stop();
-    }
-
     public void releasePlayer() {
+        mVideoPosition = mExoPlayer.getCurrentPosition();
         mExoPlayer.stop();
         mExoPlayer.release();
         mExoPlayer = null;
@@ -263,14 +257,14 @@ public class StepFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        long position = mExoPlayer.getCurrentPosition();
+        super.onSaveInstanceState(outState);
+        mVideoPosition = mExoPlayer.getCurrentPosition();
         outState.putParcelableArrayList(Constants.STATE_STEPS, mSteps);
         outState.putInt(Constants.STATE_ID, mId);
         outState.putString(Constants.STATE_DESCRIPTION, mDescription);
         outState.putString(Constants.STATE_URL, mVideoUrl);
-        outState.putLong(Constants.STATE_VIDEO_POSITION, position);
-        super.onSaveInstanceState(outState);
-
+        outState.putLong(Constants.STATE_VIDEO_POSITION, mVideoPosition);
+        Log.d("saved instance state", outState.toString());
     }
 
     /**

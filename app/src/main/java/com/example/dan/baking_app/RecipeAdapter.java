@@ -5,11 +5,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
 import com.example.dan.baking_app.objects.Ingredient;
 import com.example.dan.baking_app.objects.Step;
+import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -80,7 +82,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         //handles views that need to be populated with a step
         } else if (viewType == VIEWTYPE_STEP) {
             TextView shortDesc = ((RecipeStepViewHolder) holder).stepShortDesc;
+            ImageView thumb = ((RecipeStepViewHolder) holder).stepImage;
             Step step = (Step) mIngredientsAndSteps.get(position);
+            String thumbUrl = step.getThumbnailUrl();
+            if (!thumbUrl.equals("")) {
+                Picasso.with(thumb.getContext()).load(thumbUrl).into(thumb);
+            }
             shortDesc.setText(step.getShortDescription());
         }
     }
@@ -120,10 +127,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public class RecipeStepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView stepShortDesc;
+        ImageView stepImage;
 
         public RecipeStepViewHolder(View view) {
             super(view);
             stepShortDesc = (TextView) view.findViewById(R.id.textview_recipe_short_desc);
+            stepImage = (ImageView) view.findViewById(R.id.imageview_step_thumb);
             view.setOnClickListener(this);
         }
 

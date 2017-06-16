@@ -11,7 +11,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "recipeDb.db";
 
-    private static final int VERSION = 4;
+    private static final int VERSION = 5;
 
     public RecipeDbHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
@@ -47,6 +47,7 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
                         RecipeContract.StepEntry.COLUMN_DESCRIPTION + " Text Not Null, "        +
                         RecipeContract.StepEntry.COLUMN_SHORT_DESC  + " Text Not Null, "        +
                         RecipeContract.StepEntry.COLUMN_URL         + " Text Not Null, "        +
+                        RecipeContract.StepEntry.COLUMN_THUMB_URL   + " Text Not Null, "        +
                         RecipeContract.StepEntry.FOREIGN_KEY        + " Integer Not Null, "     +
                         "Foreign Key (" + RecipeContract.StepEntry.FOREIGN_KEY + ") References "+
                         RecipeContract.RecipeEntry.TABLE_NAME + "(" +
@@ -58,9 +59,10 @@ public class RecipeDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("Drop table if exists " + RecipeContract.RecipeEntry.TABLE_NAME);
-        db.execSQL("Drop table if exists " + RecipeContract.IngredientEntry.TABLE_NAME);
-        db.execSQL("Drop table if exists " + RecipeContract.StepEntry.TABLE_NAME);
-        onCreate(db);
+//        db.execSQL("Drop table if exists " + RecipeContract.RecipeEntry.TABLE_NAME);
+//        db.execSQL("Drop table if exists " + RecipeContract.IngredientEntry.TABLE_NAME);
+//        db.execSQL("Drop table if exists " + RecipeContract.StepEntry.TABLE_NAME);
+//        onCreate(db);
+        //implement as needed for production applications
     }
 }

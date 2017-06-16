@@ -27,15 +27,15 @@ import java.util.ArrayList;
  */
 public class RecipeFragment extends Fragment {
 
-    ArrayList<Ingredient> mIngredients;
-    ArrayList<Step> mSteps;
-    String mRecipeName;
+    private ArrayList<Ingredient> mIngredients;
+    private ArrayList<Step> mSteps;
+    private String mRecipeName;
 
-    RecyclerView mRecyclerview;
-    PassRecipeDataHandler mHandler;
-    Button mButton;
+    private RecyclerView mRecyclerview;
+    private PassRecipeDataHandler mHandler;
+    private Button mButton;
 
-    StepClickHandler mStepClickHandler;
+    private StepClickHandler mStepClickHandler;
 
     public RecipeFragment() {}
 

@@ -121,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
                                             step.getShortDescription());
                                     stepVals.put(RecipeContract.StepEntry.COLUMN_URL,
                                             step.getVideoUrl());
+                                    stepVals.put(RecipeContract.StepEntry.COLUMN_THUMB_URL,
+                                            step.getThumbnailUrl());
                                     stepVals.put(RecipeContract.StepEntry.FOREIGN_KEY,
                                             id);
                                     getContentResolver()

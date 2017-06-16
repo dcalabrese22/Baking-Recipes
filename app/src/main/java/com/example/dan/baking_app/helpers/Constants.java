@@ -3,7 +3,9 @@ package com.example.dan.baking_app.helpers;
 /**
  * Class for defining globally used constants
  */
-public class Constants {
+public final class Constants {
+
+    private Constants() {};
 
     public static final String INGREDIENT_EXTRA = "ingredient_extra";
     public static final String STEP_EXTRA = "step_extra";

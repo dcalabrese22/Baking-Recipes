@@ -27,6 +27,7 @@ public class JsonResponseParser {
     private static final String SHORT_DESCRIPTION = "shortDescription";
     private static final String DESCRIPTION = "description";
     private static final String VIDEO_URL = "videoURL";
+    private static final String THUMBNAIL_URL = "thumbnailURL";
 
     private static final String SERVINGS = "servings";
 
@@ -108,6 +109,7 @@ public class JsonResponseParser {
             String shortDesc;
             String desc;
             String vidUrl;
+            String thumbUrl;
 
             for (int i = 0; i < ingredientsJsonArray.length(); i++) {
                 JSONObject ingredientData = ingredientsJsonArray.getJSONObject(i);
@@ -115,7 +117,8 @@ public class JsonResponseParser {
                 shortDesc = ingredientData.getString(SHORT_DESCRIPTION);
                 desc = ingredientData.getString(DESCRIPTION);
                 vidUrl = ingredientData.getString(VIDEO_URL);
-                Step stepObject = new Step(id, shortDesc, desc, vidUrl);
+                thumbUrl = ingredientData.getString(THUMBNAIL_URL);
+                Step stepObject = new Step(id, shortDesc, desc, vidUrl, thumbUrl);
                 stepsList.add(stepObject);
             }
         } catch (JSONException e) {
