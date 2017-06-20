@@ -8,7 +8,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/widget_update_button"
-
         android:text="@string/button_update_widget"/>
 
     <android.support.v7.widget.RecyclerView

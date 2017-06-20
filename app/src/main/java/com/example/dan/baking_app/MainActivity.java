@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -41,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements RecipeClickHandle
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //find and set the title bar
-        Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
-        tb.setTitle(getResources().getString(R.string.app_name));
+        TextView tv = (TextView) findViewById(R.id.textview_toolbar);
+        tv.setText(getResources().getString(R.string.app_name));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_recipe_list);
         GridLayoutManager gridLayoutManager;

@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.dan.baking_app.Interfaces.PassRecipeDataHandler;
 import com.example.dan.baking_app.Interfaces.StepClickHandler;
@@ -36,6 +37,7 @@ public class RecipeDetailActivity extends AppCompatActivity
     ArrayList<Step> mSteps;
 
     private boolean mTwoPane;//for determining if the device should show the fragments side by side
+    TextView mToolbarText;
     Toolbar mToolbar;
 
     String mRecipeName;
@@ -46,6 +48,7 @@ public class RecipeDetailActivity extends AppCompatActivity
         setContentView(R.layout.activity_recipe_detail);
         //find and set the toolbar title appropriately
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbarText = (TextView) findViewById(R.id.textview_toolbar);
 
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.WIDGET_PREFERENCE,
                 Context.MODE_PRIVATE);
@@ -129,13 +132,13 @@ public class RecipeDetailActivity extends AppCompatActivity
     public void setMyTitle() {
         //two pane mode sets generic title
         if (mTwoPane) {
-            mToolbar.setTitle(getResources().getString(R.string.app_name));
+            mToolbarText.setText(getResources().getString(R.string.app_name));
         //single pane sets specific title
         } else if (getIntent().hasExtra(Constants.RECIPE_NAME_EXTRA)) {
-            mToolbar.setTitle(getIntent().getExtras().getString(Constants.RECIPE_NAME_EXTRA));
+            mToolbarText.setText(getIntent().getExtras().getString(Constants.RECIPE_NAME_EXTRA));
         //if activity is launched from widget, get correct title
         } else {
-            mToolbar.setTitle(mRecipeName);
+            mToolbarText.setText(mRecipeName);
         }
     }
 

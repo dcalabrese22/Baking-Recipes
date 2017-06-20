@@ -17,6 +17,7 @@
     <style name="ToolbarStyle">
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textSize">25sp</item>
     </style>
 
 </resources>
