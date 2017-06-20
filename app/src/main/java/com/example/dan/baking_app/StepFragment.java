@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,8 +56,6 @@ public class StepFragment extends Fragment {
     long mVideoPosition;
 
     boolean mTwoPane;
-
-    private String TAG = "Step Fragment";
 
     private static final String USER_AGENT = "ua";
     public StepFragment(){}
@@ -237,14 +234,12 @@ public class StepFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume called " + Long.toString(mVideoPosition));
         initializePlayer(mVideoUrl, mVideoPosition);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop called");
         releasePlayer();
     }
 
@@ -264,7 +259,6 @@ public class StepFragment extends Fragment {
         outState.putString(Constants.STATE_DESCRIPTION, mDescription);
         outState.putString(Constants.STATE_URL, mVideoUrl);
         outState.putLong(Constants.STATE_VIDEO_POSITION, mVideoPosition);
-        Log.d("saved instance state", outState.toString());
     }
 
     /**

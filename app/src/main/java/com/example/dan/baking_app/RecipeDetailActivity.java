@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,8 +26,6 @@ import java.util.ArrayList;
  */
 public class RecipeDetailActivity extends AppCompatActivity
         implements PassRecipeDataHandler, StepClickHandler{
-
-    private String TAG = "Recipe Detail Activity";
 
     StepFragment mStepFragment;
     RecipeFragment mRecipeFragment;
@@ -80,7 +77,6 @@ public class RecipeDetailActivity extends AppCompatActivity
         } else {
             mTwoPane = false;
             if (savedInstanceState != null) {
-                Log.d("detail activity", "saved state");
                 if (savedInstanceState.containsKey(Constants.STEP_KEY)) {
                     mStepFragment = (StepFragment) getFragmentManager()
                             .getFragment(savedInstanceState, Constants.STEP_KEY);
@@ -117,7 +113,6 @@ public class RecipeDetailActivity extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        Log.d(TAG, "onSaveInstanceState called");
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.putFragment(outState, Constants.RECIPE_KEY, mRecipeFragment);
         if (mStepFragment.isVisible()) {
@@ -155,7 +150,6 @@ public class RecipeDetailActivity extends AppCompatActivity
         //if we came from the widget, the data needs to be queried from the database
         } else {
             mIngredients = new ArrayList<>();
-            Log.d("Came from", "widget");
             Cursor cursor = getContentResolver().query(RecipeContract.RecipeEntry.CONTENT_URI,
                     null,
                     RecipeContract.RecipeEntry.COLUMN_NAME + "=?",

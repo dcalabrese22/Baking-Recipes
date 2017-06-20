@@ -8,12 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.dan.baking_app.helpers.Constants;
-
-import java.util.Date;
 
 /**
  *Widget that shows a user specified recipe's ingredients
